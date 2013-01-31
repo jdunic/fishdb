@@ -1,5 +1,7 @@
 from django.db import models
 
+# @TODO: Jillian to complete
+
 class Sites(models.Model):
     Latitude = models.CharField(max_length=255)
     Longitude = models.CharField(max_length=255)
