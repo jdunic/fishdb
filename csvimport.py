@@ -1,7 +1,13 @@
+# setup django
+from django.core.management import setup_environ
+from fishdb import settings
+
+setup_environ(settings)
+
 import csv
 
 #from django.core.management import setup_environ
-from django.fishdb.models import *
+from fishdb.models import *
 #from fishdb import settings
 
 #setup_environ(settings)
