@@ -13,14 +13,29 @@ from fishdb.models import *
 #setup_environ(settings)
 
 filename = 'csv_data/CollectionMethods.csv'
-with open(filename, 'rb') as csvfile:
+with open(filename, 'rU') as csvfile:
 	csvreader = csv.DictReader(csvfile)
 	for row in csvreader:
 		method = row['CollectionMethod']
-		cm = CollectionMethods.objects.get_or_create(
+		print method
+		cm, created = CollectionMethods.objects.get_or_create(
 			Method=method
 		)
-		cm.save()
+
+		# get_or_create returns a tuple of the object created or 
+		# retrieved and whether it was created or retrieved.
+		# therefore I have to save only the object of the tuple if
+		# it was actually created:
+
+		if created:
+			cm.Method=method
+
+			cm.save()
+		
+
+
+
+
 """
 filename = 'csv_data/FishingHabitats.csv'
 with open(filename, 'rb') as csvfile:
