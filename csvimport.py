@@ -198,72 +198,72 @@ table, that fmp_pk was not a tuple. I'm assuming that it is being turned into a 
 """
 
 def sp_import():
-	filename = 'csv_data/Taxonomies.csv'
-	with open(filename, 'rU') as csvfile:
-		csvreader = csv.DictReader(csvfile)
-		for row in csvreader:
-			EnglishName = row['EnglishName']
-			family = row['Family']
-			fmp_guild = row['fk_GuildID']
-			fmp_lw = row['fk_LengthWeightID']
-			genus = row['Genus']
-			LocalName = row['LocalName']
-			notes = row['Notes']
-			order = row['Order']
-			fmp_speciesID = row['pk_SpeciesID']
-			SciName = row['ScientificName']
-			code = row['SpeciesCode']
+    filename = 'csv_data/Taxonomies.csv'
+    with open(filename, 'rU') as csvfile:
+        csvreader = csv.DictReader(csvfile)
+        for row in csvreader:
+            EnglishName = row['EnglishName']
+            family = row['Family']
+            fmp_guild = row['fk_GuildID']
+            fmp_lw = row['fk_LengthWeightID']
+            genus = row['Genus']
+            LocalName = row['LocalName']
+            notes = row['Notes']
+            order = row['Order']
+            fmp_speciesID = row['pk_SpeciesID']
+            SciName = row['ScientificName']
+            code = row['SpeciesCode']
 
-		# make shit an int... IF not ''
-			if fmp_speciesID == '':
-				fmp_pk = None
-			if fmp_speciesID is None:
-				fmp_pk = None
-			else:
-				fmp_pk = int(fmp_speciesID)
+            # make shit an int... IF not ''
+            if fmp_speciesID == '':
+                fmp_pk = None
 
-			if fmp_guild == '':
-				guild1 = None
-			else:
-				guild1 = int(fmp_guild)
-			if fmp_lw == '':
-				lw1 = None
-			else:
-				lw1 = int(fmp_lw)
+            if fmp_speciesID is None:
+                fmp_pk = None
+            else:
+                fmp_pk = int(fmp_speciesID)
 
-		# FK lookups:
-			if guild1 is not None:
-				guild = FunctionalGroups.objects.get_or_create(fmp_guildID=guild1)
-			
-			if lw1 is not None:
-				lw = LengthWeights.objects.get_or_create(fmp_LWid=lw1)
+            if fmp_guild == '':
+                guild1 = None
+            else:
+                guild1 = int(fmp_guild)
 
-			if isinstance(fmp_pk, tuple) == True:
-				print fmp_speciesID
-			
-			#print isinstance(fmp_speciesID, int)
+            if fmp_lw == '':
+                lw1 = None
+            else:
+                lw1 = int(fmp_lw)
+            # FK lookups:
+            if guild1 is not None:
+                guild, created = FunctionalGroups.objects.get_or_create(fmp_guildID=guild1)
+                if created:
+                    print 'created guild: %s' % guild
+                    guild.save()
+            if lw1 is not None:
+                lw, created = LengthWeights.objects.get_or_create(fmp_LWid=lw1)
+                if created:
+                    print 'created lengthweights: %s' % lw
+                    lw.save()
 
-		# assigning values:
-			spp, created = Species.objects.get_or_create(
-				ScientificName=SciName,
-				Order=order,
-				Family=family,
-				Genus=genus,
-				LocalName=LocalName,
-				EnglishName=EnglishName,
-				SpeciesCode=code,
-				Notes=notes,
-				fk_Guild=guild,
-				fk_LengthWeight=lw,
-				fmp_pk=fmp_pk
-			)
+            spp, created = Species.objects.get_or_create(
+                ScientificName=SciName,
+                Order=order,
+                Family=family,
+                Genus=genus,
+                LocalName=LocalName,
+                EnglishName=EnglishName,
+                SpeciesCode=code,
+                Notes=notes,
+                fk_Guild=guild,
+                fk_LengthWeight=lw,
+                fmp_pk=int(fmp_pk)
+            )
 
-			if isinstance(fmp_pk, tuple) ==True:
-				print 'bullshit'
+            if isinstance(fmp_pk, tuple) ==True:
+                print 'bullshit'
 
-			#print Species.objects.fmp_pk()
-#			if created:
-#				spp.save()
+            #print Species.objects.fmp_pk()
+            if created:
+                spp.save()
 
 
 def sites_import():
