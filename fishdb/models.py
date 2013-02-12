@@ -387,23 +387,23 @@ class Species(models.Model): # Taxonomic information
 
 ###### ADD Many-to-Many??????
     Habitat = models.ManyToManyField('FishingHabitats')
-    Methods = models.ManyToManyFiel('FishingMethods')
+    Methods = models.ManyToManyField('FishingMethods')
 
     # to be deleted!
     fmp_pk = models.IntegerField(null=True, blank=True)
 
 
 ###### IF add many to many, remove this table?
-class SpeciesHabitats(models.Model): # Type of habitats that locals fish for 
+#class SpeciesHabitats(models.Model): # Type of habitats that locals fish for 
 # each species (many-to-many)
-    fk_Habitat = models.ForeignKey('FishingHabitats')
-    fk_Species = models.ForeignKey('Species')
+#    fk_Habitat = models.ForeignKey('FishingHabitats')
+#    fk_Species = models.ForeignKey('Species')
 
 ###### IF add many to many, remove this table?
-class SpeciesMethods(models.Model): # Fishing methods used by locals to fish for
+#class SpeciesMethods(models.Model): # Fishing methods used by locals to fish for
 # each species (many-to-many)
-    fk_Species = models.ForeignKey('Species')
-    fk_Method = models.ForeignKey('FishingMethods')
+#    fk_Species = models.ForeignKey('Species')
+#    fk_Method = models.ForeignKey('FishingMethods')
 
 class Specimens(models.Model):
     fk_Site = models.ForeignKey('Sites')
