@@ -1,12 +1,32 @@
 ###### After import is done search for CHANGE and fix the auto_update_now option)
 
 from django.db import models
+import csv
 
 
 class CollectionMethods(models.Model):
     Method = models.CharField(max_length=255, unique=True,
         verbose_name="collection method")
     # How the samples were collected
+
+#    @classmethod
+#    def import_csv(cls, filename='csv_data/CollectionMethods.csv'):
+#        with open(filename, 'rU') as csvfile:
+#            csvreader = csv.DictReader(csvfile)
+#            for row in csvreader:
+#                method = row['CollectionMethod']
+#                print method
+#                cm, created = cls.objects.get_or_create(
+#                    Method=method
+#                )
+
+                # get_or_create returns a tuple of the object created or 
+                # retrieved and whether it was created or retrieved.
+                # therefore I have to save only the object of the tuple if
+                # it was actually created:
+
+ #               if created:
+ #                   cm.save()
 
 
 class Dissections(models.Model):
@@ -137,11 +157,11 @@ class LengthWeights(models.Model): # Length to weight conversion values
     Sources = models.CharField(max_length=255, null=True, blank=True) 
     # The abbreviations should be cleaned up so that future people know 
     # where they came from.
-    ParameterA = models.DecimalField(max_digits=10, decimal_places=10, 
+    ParameterA = models.DecimalField(max_digits=30, decimal_places=20, 
         verbose_name="parameter a (for cm to g)", null=True, blank=True)
-    ParameterB = models.DecimalField(max_digits=10, decimal_places=10,
+    ParameterB = models.DecimalField(max_digits=30, decimal_places=20,
         verbose_name="parameter b (for cm to g)", null=True, blank=True)
-    fbMaxLen = models.DecimalField(max_digits=10, decimal_places=10,
+    fbMaxLen = models.DecimalField(max_digits=30, decimal_places=20,
         verbose_name="FishBase max length (mm)", null=True, blank=True) 
         # species max length, from FishBase collected by RT workstudy students 
         # in 2011
@@ -196,12 +216,12 @@ class PackedSamples(models.Model):
     
     TrayRow = models.CharField(max_length=1)
     TrayColumn = models.IntegerField()
-    CapWeight = models.DecimalField(max_digits=10, decimal_places=10,
+    CapWeight = models.DecimalField(max_digits=20, decimal_places=10,
         null=True, blank=True)
-    FilledCapWeight = models.DecimalField(max_digits=10, decimal_places=10,
+    FilledCapWeight = models.DecimalField(max_digits=20, decimal_places=10,
         null=True, blank=True)
 
-    SampleWeight = models.DecimalField(max_digits=10, decimal_places=10,
+    SampleWeight = models.DecimalField(max_digits=20, decimal_places=10,
         null=True, blank=True)
     
 
@@ -247,8 +267,8 @@ class Results(models.Model):
     # fk_SampleID necessary? I don't think so because of fk_PackedID
     fk_Packed = models.ForeignKey('PackedSamples', unique=True)
 
-    d13C = models.DecimalField(max_digits=20, decimal_places=20)
-    d15N = models.DecimalField(max_digits=20, decimal_places=20)
+    d13C = models.DecimalField(max_digits=30, decimal_places=20)
+    d15N = models.DecimalField(max_digits=30, decimal_places=20)
     Lab = models.CharField(max_length=255)
     DateProcessed = models.DateField(null=True, blank=True)
 
@@ -294,27 +314,27 @@ class SharkDissections(models.Model): # may need to change fields in this table
 # to allow: null=True, blank=True
     fk_Specimen = models.ForeignKey('Specimens', unique=True)
     
-    PCL = models.DecimalField(max_digits=10, decimal_places=10,
+    PCL = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="precaudal length (cm)")
-    FL = models.DecimalField(max_digits=10, decimal_places=10,
+    FL = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="fork length (cm)")
-    TL = models.DecimalField(max_digits=10, decimal_places=10,
+    TL = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="total length (cm)")
-    stretch = models.DecimalField(max_digits=10, decimal_places=10,
+    stretch = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="stretch length (cm)")
-    DH = models.DecimalField(max_digits=10, decimal_places=10,
+    DH = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="dorsal fin height (cm)")
-    DB = models.DecimalField(max_digits=10, decimal_places=10,
+    DB = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="dorsal fin base length (cm)")
-    PH = models.DecimalField(max_digits=10, decimal_places=10,
+    PH = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="pectoral fin height (cm)")
-    PB = models.DecimalField(max_digits=10, decimal_places=10,
+    PB = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="pectoral fin base length (cm)")
-    TH = models.DecimalField(max_digits=10, decimal_places=10,
+    TH = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="tail height (cm)")
-    TB = models.DecimalField(max_digits=10, decimal_places=10,
+    TB = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="tail base length (cm)")
-    wt = models.DecimalField(max_digits=10, decimal_places=10,
+    wt = models.DecimalField(max_digits=20, decimal_places=10,
         verbose_name="weight (lbs)")
     PhotoTaken = models.CharField(max_length=255) # so far this has just been
     # Y/N
@@ -378,7 +398,8 @@ class Species(models.Model): # Taxonomic information
     Genus = models.CharField(max_length=255, null=True, blank=True)
     LocalName = models.CharField(max_length=255, null=True, blank=True)
     EnglishName = models.CharField(max_length=255, null=True, blank=True)
-    SpeciesCode = models.CharField(max_length=255, unique=True)
+    SpeciesCode = models.CharField(max_length=255, unique=True, 
+        null=True, blank=True)
     Notes = models.TextField(verbose_name="taxonomic notes", 
         null=True, blank=True)
 
@@ -450,7 +471,10 @@ class Waypoints(models.Model):
     Longitude = models.CharField(max_length=255)
     Notes = models.CharField(max_length=255, verbose_name="waypoint notes",
         null=True, blank=True)
-    Year = models.DateField(verbose_name="year ground truthed")
+    Year = models.DateField(verbose_name="year ground truthed", 
+        null=True, blank=True)
+    # For original data where no month or day was given, August 31 was added
+    # to the year for completion
     SiteNum = models.CharField(max_length=255, null=True, blank=True,
         verbose_name="site")
     # could have had this "SiteNum" be a fk lookup, but this leaves the 

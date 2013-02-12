@@ -1,13 +1,36 @@
 from django.contrib import admin
 from fishdb.models import *
 
-admin.site.register(CollectionMethods)
+class CMadmin(admin.ModelAdmin):
+	list_display = ('Method',)
+
+class FHadmin(admin.ModelAdmin):
+	list_display = ('Habitat',)
+
+class FMadmin(admin.ModelAdmin):
+	list_display = ('Method', 'id',)
+
+class WPadmin(admin.ModelAdmin):
+	list_display = ('Waypoint', 'Latitude', 'Longitude', 'Notes', 
+		'Year', 'SiteNum', 'id',)
+
+class FGadmin(admin.ModelAdmin):
+	list_display = ('GuildName', 'GuildCode', 'id',)
+
+class LWadmin(admin.ModelAdmin):
+	list_display = ('SpeciesCode', 'LengthToMeas', 'ParameterA', 'ParameterB',
+		'ModelSpecies', 'fbMaxLen', 'fbMaxLenType', 'fbMaxRef', 'Locale', 'Sources',
+		'Notes', 'DateUpdated', 'id',)
+
+
+
+admin.site.register(CollectionMethods, CMadmin)
 admin.site.register(Dissections)
-admin.site.register(FishingHabitats)
-admin.site.register(FishingMethods)
-admin.site.register(FunctionalGroups)
+admin.site.register(FishingHabitats, FHadmin)
+admin.site.register(FishingMethods, FMadmin)
+admin.site.register(FunctionalGroups, FGadmin)
 admin.site.register(HHS)
-admin.site.register(LengthWeights)
+admin.site.register(LengthWeights, LWadmin)
 admin.site.register(Locations)
 admin.site.register(MegaPhotoQuads)
 admin.site.register(PackedSamples)
@@ -28,4 +51,4 @@ admin.site.register(Specimens)
 admin.site.register(SpecimenSpareSamples)
 admin.site.register(Trays)
 admin.site.register(Treatments)
-admin.site.register(Waypoints)
+admin.site.register(Waypoints, WPadmin)

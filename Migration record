@@ -1,0 +1,27 @@
+All CollectionMethods imported from FMP csv with 0 errors
+
+All FishingHabitats imported from FMP csv with 0 errors
+
+All FishingMethods imported from FMP csv with 0 errors
+
+All Waypoints imported from FMP csv with 0 errors
+
+All FunctionalGroups imported from FMP csv with 0 errors
+
+All LengthWeights imported from FMP csv with 0 errors
+
+
+
+
+
+
+
+from csvimport import *
+
+cm_import()
+fh_import()
+fm_import()
+wp_import()
+fg_import()
+lw_import()
+sp_import()
