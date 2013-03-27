@@ -31,17 +31,17 @@ class CollectionMethods(models.Model):
 
 class Dissections(models.Model):
     fk_Specimen = models.ForeignKey('Specimens', unique=True)
-    TL = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    TL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="total length (mm)")
-    FL = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    FL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="fork length (mm)")
-    SL = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    SL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="standard length (mm)")
-    wt = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    wt = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="weight (g)")
-    gh = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    gh = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="gape height (mm)")
-    gw = models.DecimalField(max_digits=20, decimal_places=20, null=True, 
+    gw = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
         blank=True, verbose_name="gape width (mm)")
 
     def SizeClass(self):   # Adding a method to this model to store calculated
@@ -52,7 +52,9 @@ class Dissections(models.Model):
         if self.wt > 0.0625 and self.wt <= 0.125:
             return "0.0625 - 0.125 g"
         if self.wt > 0.125 and self.wt <= 0.250:
-            return "0.125 - 0.250 g"        
+            return "0.125 - 0.250 g" 
+        if self.wt > 0.250 and self.wt <= 0.500:
+            return "0.250 - 0.500 g"       
         if self.wt > 0.500 and self.wt <= 1.000:
             return "0.5 - 1 g"        
         if self.wt > 1 and self.wt <= 2:
@@ -65,6 +67,8 @@ class Dissections(models.Model):
             return "8 - 16 g"
         if self.wt > 16 and self.wt <= 32:
             return "16 - 32 g"
+        if self.wt > 32 and self.wt <= 64:
+            return "32 - 64 g"
         if self.wt > 64 and self.wt <= 128:
             return "64 - 128 g"
         if self.wt > 128 and self.wt <= 256:
@@ -90,10 +94,13 @@ class Dissections(models.Model):
         return "No Value" 
 
     DateDissected = models.DateField(null=True, blank=True)
-    DateEntered = models.DateField(auto_now_add=False) ## CHANGE after imports #######
+    DateEntered = models.DateField(auto_now_add=True) ## CHANGE after imports #######
     StomachContents = models.TextField(null=True, blank=True)
+    # Also includes some intestinal contents (Clearly noted as Intestines: blah
+        # blah blah)
     PreySize = models.TextField(verbose_name="prey size in stomach", 
         null=True, blank=True)
+    # Typically given in mm, unless otherwise noted
     StomachSample = models.CharField(max_length=225, null=True, blank=True) 
     # Typically this has been yes/no in recent years. 
     # But there are some notes in early data
@@ -405,6 +412,7 @@ class Species(models.Model): # Taxonomic information
 
     fk_Guild = models.ForeignKey('FunctionalGroups', null=True, blank=True)
     fk_LengthWeight = models.ForeignKey('LengthWeights', null=True, blank=True)
+    fk_Type = models.ForeignKey('SpeciesTypes')
 
 ###### ADD Many-to-Many??????
     Habitat = models.ManyToManyField('FishingHabitats')
@@ -413,6 +421,8 @@ class Species(models.Model): # Taxonomic information
     # to be deleted!
     fmp_pk = models.IntegerField(null=True, blank=True)
 
+class SpeciesTypes(models.Model): # Fish, Shark, Macro, etc
+    Type = models.CharField(max_length=255)
 
 ###### IF add many to many, remove this table?
 #class SpeciesHabitats(models.Model): # Type of habitats that locals fish for 
@@ -428,7 +438,7 @@ class Species(models.Model): # Taxonomic information
 
 class Specimens(models.Model):
     fk_Site = models.ForeignKey('Sites')
-    fk_Species = models.ForeignKey('Species')
+    fk_Species = models.ForeignKey('Species', null=False, blank=False)
     fk_Method = models.ForeignKey('CollectionMethods', 
         null=True, blank=True)
 
@@ -436,12 +446,12 @@ class Specimens(models.Model):
         verbose_name="physical label")
     CollectedBy = models.CharField(max_length=255, null=True, blank=True)
     Sex = models.CharField(max_length=255, null=True, blank=True)
-    OldID1 = models.CharField(max_length=255, verbose_name="old id 1 ???", 
-        null=True, blank=True)
+    OldID1 = models.CharField(max_length=255, null=True, blank=True)
     DateEntered = models.DateTimeField(auto_now_add=True)
     CollectionNotes = models.TextField(null=True, blank=True)
     DateCollected = models.DateField(null=True, blank=True)
     DepthCollected = models.CharField(max_length=255, null=True, blank=True)
+    # measured in feet!
 
     # to be deleted!
     fmp_pk = models.IntegerField(null=True, blank=True)
