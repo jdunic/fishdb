@@ -7,6 +7,9 @@ import csv
 class CollectionMethods(models.Model):
     Method = models.CharField(max_length=255, unique=True,
         verbose_name="collection method")
+
+    def __unicode__(self):
+        return u'%s' % (self.Method)
     # How the samples were collected
 
 #    @classmethod
@@ -31,17 +34,17 @@ class CollectionMethods(models.Model):
 
 class Dissections(models.Model):
     fk_Specimen = models.ForeignKey('Specimens', unique=True)
-    TL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    TL = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="total length (mm)")
-    FL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    FL = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="fork length (mm)")
-    SL = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    SL = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="standard length (mm)")
-    wt = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    wt = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="weight (g)")
-    gh = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    gh = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="gape height (mm)")
-    gw = models.DecimalField(max_digits=60, decimal_places=5, null=True, 
+    gw = models.DecimalField(max_digits=20, decimal_places=3, null=True, 
         blank=True, verbose_name="gape width (mm)")
 
     def SizeClass(self):   # Adding a method to this model to store calculated
@@ -101,9 +104,10 @@ class Dissections(models.Model):
     PreySize = models.TextField(verbose_name="prey size in stomach", 
         null=True, blank=True)
     # Typically given in mm, unless otherwise noted
-    StomachSample = models.CharField(max_length=225, null=True, blank=True) 
-    # Typically this has been yes/no in recent years. 
-    # But there are some notes in early data
+    #StomachSample = models.CharField(max_length=225, null=True, blank=True)
+    StomachSample = models.NullBooleanField() 
+    # Null means that it is unknown whether a stomach sample exists. Ideally
+    # these can be filled in as the samples are used and accounted for.
     IsotopeSample = models.CharField(max_length=255, null=True, blank=True) 
     # In recent years this is a of samples taken. 
     # However, early data has just Y/N
@@ -120,6 +124,9 @@ class Dissections(models.Model):
     Notes = models.TextField(verbose_name="dissection notes", 
         null=True, blank=True) # may include parasitological notes
 
+    def __unicode__(self):
+        return u'%s dissection' % (self.fk_Specimen.SpecimenID)
+
 # Filemaker pro fun fact 1: importing a table with fk lookups requires the most
     # stupid procedure... including redunant columns... 
     # This should be your first tip off that it is NOT worth using.
@@ -127,13 +134,16 @@ class Dissections(models.Model):
 class FishingHabitats(models.Model):
     Habitat = models.CharField(max_length=255, unique=True) # Habitat type where 
     # local fishers classify catching fish
-    fmp_habitat = models.IntegerField() ### FMP is shit
+    def __unicode__(self):
+        return u'%s' % (self.Habitat)
+
 
 class FishingMethods(models.Model):
     Method = models.CharField(max_length=255, unique=True,
         verbose_name="fishing method") # Method that local fishers
     # typically catch a given fish species.
-    fmp_methodID = models.IntegerField() ### FMP is shit 
+    def __unicode__(self):
+        return u'%s' % (self.Method)
 
 class FunctionalGroups(models.Model):
     GuildName = models.CharField(max_length=255, unique=True) # verbose name
@@ -141,12 +151,18 @@ class FunctionalGroups(models.Model):
     # assigned to functional groups
     fmp_guildID = models.IntegerField() ### FMP is shit 
 
+    def __unicode__(self):
+        return u'%s' % (self.GuildCode)
+
 class HHS(models.Model): # Household surveys
     Names = models.CharField(max_length=255)
     Village = models.CharField(max_length=255)
     FishingLocation = models.CharField(max_length=255, null=True, blank=True) 
     # typical household fishing location
     DateSurveyed = models.DateField()
+
+    def __unicode__(self):
+        return u'%s %s' % (self.Names, self.DateSurveyed)
 
     fmp_pk = models.IntegerField() # FMP is shit.
 
@@ -164,14 +180,14 @@ class LengthWeights(models.Model): # Length to weight conversion values
     Sources = models.CharField(max_length=255, null=True, blank=True) 
     # The abbreviations should be cleaned up so that future people know 
     # where they came from.
-    ParameterA = models.DecimalField(max_digits=30, decimal_places=20, 
+    ParameterA = models.DecimalField(max_digits=30, decimal_places=10, 
         verbose_name="parameter a (for cm to g)", null=True, blank=True)
-    ParameterB = models.DecimalField(max_digits=30, decimal_places=20,
+    ParameterB = models.DecimalField(max_digits=30, decimal_places=10,
         verbose_name="parameter b (for cm to g)", null=True, blank=True)
-    fbMaxLen = models.DecimalField(max_digits=30, decimal_places=20,
+    fbMaxLen = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="FishBase max length (mm)", null=True, blank=True) 
         # species max length, from FishBase collected by RT workstudy students 
-        # in 2011
+        # in 2011 with max length recorded in mm
     fbMaxLenType = models.CharField(max_length=255,
         verbose_name="FishBase max length type", null=True, blank=True)
     fbMaxRef = models.CharField(max_length=255, 
@@ -194,8 +210,10 @@ class LengthWeights(models.Model): # Length to weight conversion values
     # length for which theh parameters are used to calculate/reverse calc
     Locale = models.CharField(max_length=255, null=True, blank=True) 
     # location where LW measurements recorded
-    fmp_LWid = models.IntegerField() # FMP is shit
+    fmp_LWid = models.IntegerField(null=True, blank=True) # FMP is shit
 
+    def __unicode__(self):
+        return u'Model Species: %s' % (self.ModelSpecies)
 
 class Locations(models.Model): # The box number and type of container (e.g., 
     # scintillation, microtubes) that the DRIED and usually ground sample can
@@ -204,14 +222,25 @@ class Locations(models.Model): # The box number and type of container (e.g.,
     ContainerType = models.CharField(max_length=255)
     ContainerName = models.CharField(max_length=255)
     Institution = models.CharField(max_length=255)
-    fmp_locationID = models.IntegerField() # (FMP pk) FMP is shit
+    fmp_locationID = models.IntegerField(null=True, blank=True) # (FMP pk) FMP is shit
 
     class Meta:
         unique_together = ("ContainerType", "ContainerName", "Institution")
 
+    def __unicode__(self):
+        return u'%s %s %s' % (self.ContainerType, 
+                              self.ContainerName, 
+                              self.Institution
+                              )
+
 class MegaPhotoQuads(models.Model):
     fk_Site = models.ForeignKey('Sites')
     fk_Waypoint = models.ForeignKey('Waypoints')
+    
+    MPQ_Name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return u'%s %s' % (self.MPQ_Name)
 
 ##### MPQ's, one source of information on what sites you can find MPQs are in 
     # the Dropbox > stable_isotope_database > input_data >
@@ -223,28 +252,20 @@ class PackedSamples(models.Model):
     
     TrayRow = models.CharField(max_length=1)
     TrayColumn = models.IntegerField()
-    CapWeight = models.DecimalField(max_digits=20, decimal_places=10,
+    CapWeight = models.DecimalField(max_digits=10, decimal_places=4,
         null=True, blank=True)
-    FilledCapWeight = models.DecimalField(max_digits=20, decimal_places=10,
+    FilledCapWeight = models.DecimalField(max_digits=10, decimal_places=4,
         null=True, blank=True)
-
-    SampleWeight = models.DecimalField(max_digits=20, decimal_places=10,
-        null=True, blank=True)
-    
-
-# To be uncommented in the future a) after all fmp data has been entered
-    # and b) when CapWeight, and FilledCapWeight is guaranteed to be entered 
-#    def SampleWeight(self):
- #       return (self.FilledCapWeight - self.CapWeight)
-
+    SampleWeight = models.DecimalField(max_digits=10, decimal_places=4,
+        null=True, blank=True) 
     PackedBy = models.CharField(max_length=255)
     EnteredBy = models.CharField(max_length=255)
-    DatePacked = models.DateField()
-    DateEntered = models.DateField() # CHANGE later to auto_now_add=True
+    DatePacked = models.DateField(null=True, blank=True)
+    DateEntered = models.DateField(auto_now_add=True)
     Notes = models.TextField(verbose_name="packed sample notes", 
         null=True, blank=True)
 
-    fmp_packedID = models.IntegerField() # fmp is shit
+    fmp_packedID = models.IntegerField(null=True, blank=True) # fmp is shit
 
     # Filemaker pro fun fact 2: if you want to make sure you export all the data
         # from a single table... make damn well sure you have ALL records 
@@ -252,6 +273,13 @@ class PackedSamples(models.Model):
 
     class Meta:
         unique_together = ("fk_TrayName", "TrayRow", "TrayColumn")
+
+    def __unicode__(self):
+        return u'Sample: %s in %s  %s%s' % (self.fk_Sample.SampleID,
+                              self.fk_TrayName.TrayName,
+                              self.TrayRow,
+                              self.TrayColumn
+                              )
 
 class Preprocessings(models.Model):
     fk_Sample = models.ForeignKey('Samples', unique=True)
@@ -267,19 +295,25 @@ class Preprocessings(models.Model):
     Notes = models.TextField(verbose_name="preprocessing notes",
         null=True, blank=True)
 
-    fmp_preprocessings = models.IntegerField() # fmp is shit
+    def __unicode__(self):
+        return u'%s treatment: %s' % (self.fk_Sample.SampleID,
+                                      self.fk_Treatment.TreatmentCode
+                                      )
+
+    #fmp_preprocessings = models.IntegerField(null=True, blank=True) # fmp is shit
 
 class Results(models.Model):
 #    fk_SampleID = models.ForeignKey('Samples', unique=True)
     # fk_SampleID necessary? I don't think so because of fk_PackedID
     fk_Packed = models.ForeignKey('PackedSamples', unique=True)
 
-    d13C = models.DecimalField(max_digits=30, decimal_places=20)
-    d15N = models.DecimalField(max_digits=30, decimal_places=20)
+    d13C = models.DecimalField(max_digits=20, decimal_places=10)
+    d15N = models.DecimalField(max_digits=20, decimal_places=10)
     Lab = models.CharField(max_length=255)
     DateProcessed = models.DateField(null=True, blank=True)
-
-
+    # date_processed unnecessary? comment out?
+    def __unicode__(self):
+        return u'%s result' % (self.fk_Packed.fk_Sample.SampleID)
 
 
 class SampleLocations(models.Model):
@@ -288,7 +322,6 @@ class SampleLocations(models.Model):
     
     DateUpdated = models.DateField(auto_now_add=True)
     EnteredBy = models.CharField(max_length=255)
-    Institution = models.CharField(max_length=255)
 
     # FMP fun fact 3: you need to create an extra calculation field to make
         # composite keys before you can constrain your data to have unique
@@ -297,77 +330,110 @@ class SampleLocations(models.Model):
     class Meta:
         unique_together = ("fk_Sample", "fk_Location", "DateUpdated")
 
+    def __unicode__(self):
+        return u'%s' % (self.fk_Location)
 
 class Samples(models.Model):
     fk_Specimen = models.ForeignKey('Specimens')
     fk_SampleType = models.ForeignKey('SampleTypes')
-    
+
+    OldSampleID = models.CharField(max_length=255, null=True, blank=True)
+    # OldSampleID is the likely written label (on the bottle/on the label inside
+        # the bottle)
+    # OldSampleID names may also be found in the notes if not in this field.
     SampleID = models.CharField(max_length=255, unique=True)
     Notes = models.TextField(verbose_name="sample notes", null=True, blank=True)
 
-    fmp_pk = models.IntegerField() # fmp is shit
+    def __unicode__(self):
+        return u'%s' % (self.SampleID)
 
     # FMP fun fact 4: on average, it takes a user 6 months of using FMP before
         # they break and move to a real db solution.
 
-class SampleTypes(models.Model):
-    SampleType = models.CharField(max_length=255, unique=True) # Sample type, e.g, fish, 
-    # muscle, POM, algae
-    TypeCode = models.CharField(max_length=255, unique=True) # 'code' for sample type
 
-    fmp_pk = models.IntegerField() # fmp is shit
+class SampleTypes(models.Model):
+    SampleType = models.CharField(max_length=255, unique=True) 
+    # Sample type, e.g, fish, muscle, POM, algae
+    TypeCode = models.CharField(max_length=255, unique=True) 
+    # 'code' for sample type
+
+    def __unicode__(self):
+        return u'%s' % (self.SampleType)
+
+    fmp_pk = models.IntegerField(null=True, blank=True) # fmp is shit
 
 class SharkDissections(models.Model): # may need to change fields in this table
 # to allow: null=True, blank=True
     fk_Specimen = models.ForeignKey('Specimens', unique=True)
     
-    PCL = models.DecimalField(max_digits=20, decimal_places=10,
+    PCL = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="precaudal length (cm)")
-    FL = models.DecimalField(max_digits=20, decimal_places=10,
+    FL = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="fork length (cm)")
-    TL = models.DecimalField(max_digits=20, decimal_places=10,
+    TL = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="total length (cm)")
-    stretch = models.DecimalField(max_digits=20, decimal_places=10,
+    stretch = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="stretch length (cm)")
-    DH = models.DecimalField(max_digits=20, decimal_places=10,
+    DH = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="dorsal fin height (cm)")
-    DB = models.DecimalField(max_digits=20, decimal_places=10,
+    DB = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="dorsal fin base length (cm)")
-    PH = models.DecimalField(max_digits=20, decimal_places=10,
+    PH = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="pectoral fin height (cm)")
-    PB = models.DecimalField(max_digits=20, decimal_places=10,
+    PB = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="pectoral fin base length (cm)")
-    TH = models.DecimalField(max_digits=20, decimal_places=10,
+    TH = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="tail height (cm)")
-    TB = models.DecimalField(max_digits=20, decimal_places=10,
+    TB = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="tail base length (cm)")
-    wt = models.DecimalField(max_digits=20, decimal_places=10,
+    wt = models.DecimalField(max_digits=20, decimal_places=3,
         verbose_name="weight (lbs)")
     PhotoTaken = models.CharField(max_length=255) # so far this has just been
     # Y/N
     Notes = models.TextField(verbose_name="shark dissection notes")
     DateDissected = models.DateField()
 
+    def __unicode__(self):
+        return u'shark: %s dissection' % (self.fk_Specimen.SpecimenID)
+
 class SharkPieces(models.Model):
-    SharkPiece = models.CharField(max_length=255, unique=True) # location (e.g., dorsal fin,
-        # pectoral fin, dorsal muscle plug) from which a sample was taken
+    SharkPiece = models.CharField(max_length=255, unique=True) 
+    # location (e.g., dorsal fin, pectoral fin, dorsal muscle plug) 
+    # from which a sample was taken
+
+    def __unicode__(self):
+        return u'%s' % (self.SharkPiece)
 
 class SharkSamples(models.Model):
     fk_Sample = models.ForeignKey('Samples')
     fk_SharkPiece = models.ForeignKey('SharkPieces')
     fk_State = models.ForeignKey('SharkStates')
-    fk_HHS = models.ForeignKey('HHS', null=True, blank=True)
-    FromHHS = models.BooleanField() # Is the shark sample from a HHS? 
+#    fk_HHS = models.ForeignKey('HHS', null=True, blank=True)
+#    FromHHS = models.BooleanField() # Is the shark sample from a HHS? 
     # A true/false field.
     
     DateDissected = models.DateField() # Date that a shark piece was dissected
     # into bits like muscle, skin, ray, etc.
-    Notes = models.TextField(verbose_name="shark sample notes", 
-        null=True, blank=True)
+    #Notes = models.TextField(verbose_name="shark sample notes", 
+     #   null=True, blank=True)
+
+    def __unicode__(self):
+        return u'shark sample: %s' % (self.fk_Sample.SampleID)
+
+class SharkSpecimens(models.Model): # This table allows sharks collected from
+    # household surveys to be paired with the appropriate hhs data. 
+    fk_SpecimenID = models.ForeignKey('Specimens')
+    fk_HHS = models.ForeignKey('HHS', null=True, blank=True)
+
+    def __unicode__(self):
+        return u'shark specimen: %s' % (self.fk_SpecimenID.SpecimenID)
 
 class SharkStates(models.Model): # type of treatment: e.g., Fresh, sun-dried, 
-# oven-dried (experimental)
+    # oven-dried (experimental)
     State = models.CharField(max_length=255, unique=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.State)
 
 
 class Sites(models.Model): #pks are assigned automatically
@@ -376,7 +442,7 @@ class Sites(models.Model): #pks are assigned automatically
     Longitude = models.CharField(max_length=255, null=True, blank=True)
     IslandArea = models.CharField(max_length=255, null=True, blank=True)
     ProdFish = models.CharField(max_length=255) # Combined productivity and 
-    # fishing categories determined by RT and JKB in 2011.
+        # fishing categories determined by RT and JKB in 2011.
     BoatAccessibility = models.CharField(max_length=255, null=True, blank=True)
     ShoreEntry = models.CharField(max_length=255, null=True, blank=True)
     RTCW_Fishing = models.CharField(max_length=255, 
@@ -396,7 +462,10 @@ class Sites(models.Model): #pks are assigned automatically
         # PhD thesis
     Notes = models.TextField(verbose_name="site notes", null=True, blank=True)
 
-    fmp_pk = models.IntegerField() # FMP is shit
+    #fmp_pk = models.IntegerField(null=True, blank=True) # FMP is shit
+
+    def __unicode__(self):
+        return u'%s' % (self.SiteName)
 
 class Species(models.Model): # Taxonomic information
     ScientificName = models.CharField(max_length=255, null=True, blank=True)
@@ -415,26 +484,24 @@ class Species(models.Model): # Taxonomic information
     fk_Type = models.ForeignKey('SpeciesTypes')
 
 ###### ADD Many-to-Many??????
-    Habitat = models.ManyToManyField('FishingHabitats')
+    Habitats = models.ManyToManyField('FishingHabitats')
     Methods = models.ManyToManyField('FishingMethods')
+
+    def habitat_names(self):
+        return ', '.join([a.Habitats for a in self.FishingHabitats.all()])
+
+    def __unicode__(self):
+        return u'%s' % (self.SpeciesCode)
 
     # to be deleted!
     fmp_pk = models.IntegerField(null=True, blank=True)
 
-class SpeciesTypes(models.Model): # Fish, Shark, Macro, etc
+class SpeciesTypes(models.Model): # urchin, shark, macro, fish
     Type = models.CharField(max_length=255)
 
-###### IF add many to many, remove this table?
-#class SpeciesHabitats(models.Model): # Type of habitats that locals fish for 
-# each species (many-to-many)
-#    fk_Habitat = models.ForeignKey('FishingHabitats')
-#    fk_Species = models.ForeignKey('Species')
+    def __unicode__(self):
+        return u'%s' % (self.Type)
 
-###### IF add many to many, remove this table?
-#class SpeciesMethods(models.Model): # Fishing methods used by locals to fish for
-# each species (many-to-many)
-#    fk_Species = models.ForeignKey('Species')
-#    fk_Method = models.ForeignKey('FishingMethods')
 
 class Specimens(models.Model):
     fk_Site = models.ForeignKey('Sites')
@@ -443,7 +510,7 @@ class Specimens(models.Model):
         null=True, blank=True)
 
     SpecimenID = models.CharField(max_length=255, unique=True,
-        verbose_name="physical label")
+        verbose_name="SpecimenID")
     CollectedBy = models.CharField(max_length=255, null=True, blank=True)
     Sex = models.CharField(max_length=255, null=True, blank=True)
     OldID1 = models.CharField(max_length=255, null=True, blank=True)
@@ -452,16 +519,28 @@ class Specimens(models.Model):
     DateCollected = models.DateField(null=True, blank=True)
     DepthCollected = models.CharField(max_length=255, null=True, blank=True)
     # measured in feet!
+    
+    # makes specimenID appear as an actual specimenID in drop 
+        #down menus and such
+    def __unicode__(self): 
+        return u'%s' % (self.SpecimenID)
+# Note: a count query of specimens will produce a higher number of specimens
+# than actually sampled. Shark specimens do not always represent individuals. 
+# There are single sharks represented by multiple specimenIDs
 
-    # to be deleted!
-    fmp_pk = models.IntegerField(null=True, blank=True)
+
 
 class SpecimenSpareSamples(models.Model):
     fk_Specimen = models.ForeignKey('Specimens')
-    Container = models.CharField(max_length=255, 
+    Container = models.CharField(max_length=255, null=True, blank=True,
         verbose_name="archived sample container name")
     Institution = models.CharField(max_length=255)
     DateUpdated = models.DateField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s spare location: %s' % (self.fk_Specimen.SpecimenID,
+                                           self.Container
+                                           )
 
 #    class Meta:
 #        unique_together = ("fk_Specimen", "DateUpdated")
@@ -471,9 +550,16 @@ class SpecimenSpareSamples(models.Model):
 class Trays(models.Model):
     TrayName = models.CharField(max_length=255, unique=True)
 
+    def __unicode__(self):
+        return u'%s' % (self.TrayName)
+
 class Treatments(models.Model):
-    Treatment = models.CharField(max_length=255, unique=True) # raw, acidified, non-acidified
+    Treatment = models.CharField(max_length=255, unique=True) 
+    # raw, acidified, non-acidified
     TreatmentCode = models.CharField(max_length=255, unique=True)
+
+    def __unicode__(self):
+        return u'%s' % (self.TreatmentCode)
 
 class Waypoints(models.Model):
     Waypoint = models.CharField(max_length=255) # name of waypoint
@@ -493,6 +579,9 @@ class Waypoints(models.Model):
 
     class Meta:
         unique_together = ("Waypoint", "Year")
+
+    def __unicode__(self):
+        return u'%s' % (self.Waypoint)
 
 
 

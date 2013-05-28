@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'django_extensions',
+    'data_exports',
     'fishdb',
 )
 
