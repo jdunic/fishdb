@@ -1,0 +1,6 @@
+Django==1.4.3
+django-data-exports==0.3
+django-extensions==1.0.3
+django-inspect-model==0.4
+pygraphviz==1.1
+wsgiref==0.1.2
