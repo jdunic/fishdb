@@ -43,3 +43,5 @@ nosetests.xml
 
 csv_data/*
 *.csv
+.DS_Store
+*.pdf
