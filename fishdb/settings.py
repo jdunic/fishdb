@@ -1,4 +1,7 @@
+from os.path import dirname, realpath, join
+
 # Django settings for fishdb project.
+DJANGO_ROOT = dirname(realpath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -12,7 +15,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/Users/jillian/Databases/fishdb/db/sqlite3.db',                      # Or path to database file if using sqlite3.
+        'NAME': join(DJANGO_ROOT, 'sqlite3.db'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -97,7 +100,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'fishdb.urls'
+ROOT_URLCONF = 'urls' #fishdb.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'fishdb.wsgi.application'
@@ -115,11 +118,17 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'apps.data',
+    'apps.helpers',
+    'apps.sharks',
+    'apps.species',
+
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'django_extensions',
-    'data_exports',
-    'fishdb',
+    'data_exports'
+
 )
 
 # A sample logging configuration. The only tangible logging
