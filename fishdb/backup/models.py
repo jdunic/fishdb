@@ -1,6 +1,7 @@
 ###### After import is done search for CHANGE and fix the auto_update_now option)
 
 from django.db import models
+import csv
 
 
 class CollectionMethods(models.Model):
@@ -489,6 +490,7 @@ class Species(models.Model): # Taxonomic information
 
     def habitat_names(self):
         return ', '.join([a.Habitats for a in self.FishingHabitats.all()])
+
     def __unicode__(self):
         return u'%s' % (self.SpeciesCode)
 
@@ -559,7 +561,7 @@ class Trays(models.Model):
 
 class Treatments(models.Model):
     Treatment = models.CharField(max_length=255, unique=True) 
-    # raw, acidified, non-acidified, no treatment
+    # raw, acidified, non-acidified
     TreatmentCode = models.CharField(max_length=255, unique=True)
 
     def __unicode__(self):

@@ -65,7 +65,7 @@ with open(filename, 'wb') as open_file:
 
         site = s.fk_Specimen.fk_Site.SiteName
         maxL = s.fk_Specimen.fk_Species.fk_LengthWeight.fbMaxLen
-        size = d.TL.filter(fk_Specimen__id=specID)
+        treatment = s.fk_
 
         writer.writerow([unicode(s).encode("utf-8") for s in row])
 

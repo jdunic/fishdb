@@ -27,7 +27,10 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 
 from fishdb import settings
-from fishdb.models import *
+from apps.data.models import *
+from apps.helpers.models import *
+from apps.sharks.models import *
+from apps.species.models import *
 
 setup_environ(settings)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")
@@ -431,9 +434,18 @@ def trays_import():
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
             tray = row['TrayName']
+            notes = row['Notes']
+            submit = row['Submitted']
+
+            if submit == 'Y':
+                submit = True
+            else:
+                submit = False
 
             tr, created = Trays.objects.get_or_create(
-                TrayName=tray
+                TrayName=tray,
+                Notes=notes,
+                Submitted=submit
             )
 
             if created:
@@ -1098,6 +1110,10 @@ def dis_import_CW2(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
             Intestines = row['intestine']
             units = row['length.units']
 
+            spp = specimen.fk_Species.SpeciesCode
+            if spp == 'CH.MARG':
+                Notes += '. All samples for Chromis Margaritifer were lost from the Stanford freezer, so there are no subsequent processing or isotope data for these fish'
+
             if Intestines != 'NA':
                 StomachContents += '. Intestines: %s' % Intestines
 
@@ -1551,7 +1567,6 @@ def shark_spec_import():
                     DateSurveyed = date_surveyed
                     )
 
-                print spp.SpeciesCode
 
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s does not exist' % (line_number, e))
@@ -2464,7 +2479,7 @@ def main():
     print '---------'
     print '>> Start of results imports'
     print '> SFU old results import'
-    #results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/consolidated_sfu_results.csv")
+    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/consolidated_sfu_results.csv")
     print '> UVic KI12TRAY1-7 import'
     results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/KIF_Tray1-7 data.csv")
 

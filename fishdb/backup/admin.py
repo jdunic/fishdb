@@ -79,7 +79,7 @@ class TREadmin(admin.ModelAdmin):
 
 
 class TRAYadmin(admin.ModelAdmin):
-    list_display = ('TrayName', 'id')
+    list_display = ('TrayName', 'Submitted', 'Notes', 'id',)
 
 
 class WPadmin(admin.ModelAdmin):
@@ -194,8 +194,9 @@ class SAMPadmin(admin.ModelAdmin):
     list_display = ('SampleID', 'get_specID', 'get_species', 'get_treat', 
         'get_type', 'OldSampleID', 'Notes',)
 
-    list_filter = ['fk_Specimen__fk_Species__Genus', 
-                   'preprocessings__fk_Treatment__TreatmentCode']
+    list_filter = ['fk_Specimen__fk_Species__fk_Type__Type', 
+                   'preprocessings__fk_Treatment__TreatmentCode'
+                   ]
 
     search_fields = ['SampleID', 
                      'fk_SampleType__SampleType',
@@ -212,6 +213,7 @@ class PREPadmin(admin.ModelAdmin):
     def get_treat(self, o):
         return '%s' % o.fk_Treatment.TreatmentCode
     get_treat.short_description = "Treatment"
+    get_treat.admin_order_field = "fk_Treatment__TreatmentCode"
 
     list_display = ('get_sampID', 'get_treat', 'DateWashDry', 'DateGround', 
         'Notes',)
@@ -227,6 +229,7 @@ class PSadmin(admin.ModelAdmin):
     def get_tray(self, o):
         return '%s' % o.fk_TrayName.TrayName
     get_tray.short_description = "Tray"
+    get_tray.admin_order_field = "fk_TrayName__TrayName"
 
     list_display = ('get_sampID', 'get_tray', 'TrayRow', 'TrayColumn', 'Notes', 'id', )
 
@@ -243,6 +246,11 @@ class REadmin(admin.ModelAdmin):
     get_tray.short_description = "Tray"
 
     list_display = ('get_sampID', 'get_tray', 'd13C', 'd15N', 'Lab',)
+
+    search_fields = ['fk_Packed__fk_Sample__SampleID',
+                     'fk_Packed__fk_TrayName__TrayName',
+                     'Lab'
+                     ]
 
 
 

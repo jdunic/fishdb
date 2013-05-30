@@ -3,6 +3,7 @@
 import csv
 import logging
 import os
+from datetime import datetime
 
 from django.core.management import setup_environ
 from django.db.models import Q, Count
@@ -18,9 +19,10 @@ setup_environ(settings)
 logging.basicConfig(level=logging.INFO)
 
 # Creating file
+date = datetime.now().strftime('%b%d')
+date_y = datetime.now().strftime('%b %d, %Y')
 
-
-filename = "pi_todo_list_May28.csv"
+filename = "pi_todo_list_%s.csv" % date
 
 writer = csv.writer(open(filename, 'wb'), dialect='excel')
 
@@ -30,7 +32,7 @@ row = ["Piscivore/Apex Predator specimens list. This list can be used to check w
 writer.writerow(row)
 row = ["Original query file: Pi_todo_list_export.py"]
 writer.writerow(row)
-row = ["Query date: May 27, 2013, by JD"]
+row = ["Query date: %s, by JD" % date_y]
 writer.writerow(row)
 
 row = [
@@ -61,19 +63,13 @@ writer.writerow(row)
 
 
 piscs = Species.objects.select_related().filter( 
-    Q(fk_Guild__GuildCode = 'Pi') | Q(fk_Guild__GuildCode = 'AP')).filter(
-    )
+    Q(fk_Guild__GuildCode__in = ['Pi', 'AP']))
 
 # Prints a list of Pi/AP species:
 for p in piscs:
     spp = piscs.get(SpeciesCode = p)
 
-# All samples of Pi or AP species
-samps = Samples.objects.select_related().filter(
-    Q(fk_Specimen__fk_Species__fk_Guild__GuildCode = 'Pi') |
-    Q(fk_Specimen__fk_Species__fk_Guild__GuildCode = 'AP')
-    )
-
+# All specimens of Pi or AP species
 specs = Specimens.objects.select_related().filter(
     Q(fk_Species__fk_Guild__GuildCode = 'Pi') |
     Q(fk_Species__fk_Guild__GuildCode = 'AP')
@@ -84,9 +80,8 @@ print specs.count()
 
 line_number = 0
 
-for s in specs:
+for spec in specs:
     line_number += 1
-    spec = specs.get(SpecimenID = s)
     spp = spec.fk_Species.SpeciesCode
     try:
         dis = spec.dissections_set.get()
@@ -95,14 +90,14 @@ for s in specs:
         size = dis.SizeClass()
 
     except ObjectDoesNotExist as e:
-        logging.warn("%s, %s" % (spec, e))
+        #logging.warn("%s, %s" % (spec, e))
         stom_bool = "no dissection data"
         stom_cont = "no data"
         size = "no data"
     #sc = specs.get(SpecimenID = s).SizeClass()
-    samps = specs.get(SpecimenID = s).samples_set.all()
+    samps = spec.samples_set.all()
     row = [
-        spec,
+        spec.SpecimenID,
         spp,
         size,
         stom_bool,
@@ -113,20 +108,22 @@ for s in specs:
         try:
             row.append(samp)
             treat = Preprocessings.objects.get(
-                fk_Sample__SampleID = samp).fk_Treatment.TreatmentCode
+                fk_Sample=samp).fk_Treatment.TreatmentCode
 
         except ObjectDoesNotExist as e:
-            logging.warn("%s treatment %s" % (samp, e))
+            #logging.warn("%s treatment %s" % (samp, e))
             treat = "unknown treatment or not in db"
         try:
-            packed = PackedSamples.objects.all().filter(
-                fk_Sample__SampleID = samp)
-            ps = packed.get().fk_TrayName.TrayName
+            ps_list = samp.packedsamples_set.all().values_list('fk_TrayName__TrayName', flat=True)
+            ps = ', '.join(ps_list)
+            #packed = PackedSamples.objects.all().filter(
+            #    fk_Sample__SampleID = samp)
+            #ps = packed.get().fk_TrayName.TrayName
         except ObjectDoesNotExist as e:
-            logging.warn("%s not packed" % samp)
+            #logging.warn("%s not packed" % samp)
             ps = "not packed"
         except MultipleObjectsReturned as e:
-            logging.warn("sample %s has %s" % (samp, e))
+            #logging.warn("sample %s has %s" % (samp, e))
             ps = "multiple packed samples"
         
         row.append(treat)
@@ -135,14 +132,18 @@ for s in specs:
         try:
             results = Results.objects.all().filter(
                 fk_Packed__fk_Sample__SampleID = samp)
+            #c_list = results.values_list('d13C', flat=True)
+            #c = ', '.join('%s' % repr(c_list))
             c = results.get().d13C
+            #n_list = results.values_list('d15N', flat=True)
+            #n = ', '.join("%s" % repr(n_list))
             n = results.get().d15N
 
             row.append(c)
             row.append(n)
 
         except ObjectDoesNotExist as e:
-            logging.warn("%s result %s" % (samp, e))
+            #logging.warn("%s result %s" % (samp, e))
             c = "Result dne"
             n = "Result dne"
 
@@ -150,7 +151,7 @@ for s in specs:
             row.append(n)
 
         except MultipleObjectsReturned as e:
-            logging.warn("%s result %s" % (samp, e))
+            #logging.warn("%s result %s" % (samp, e))
             c = "multiple results"
             n = "multiple results"
 
