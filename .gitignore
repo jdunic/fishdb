@@ -46,3 +46,5 @@ csv_data/*
 .DS_Store
 *.pdf
 *.xlsx
+*.png
+*.xls

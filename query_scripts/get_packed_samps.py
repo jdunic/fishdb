@@ -3,20 +3,23 @@ import csv
 import os
 
 from django.core.management import setup_environ
-from django.db.models import Q
 
 from fishdb import settings
-from fishdb.models import *
+from apps.data.models import *
+from apps.helpers.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")
 setup_environ(settings)
 
-filename = "RT_KI_03_packinglist.csv"
+filename = "KI12TRAY8-15_packinglist.csv"
 
 writer = csv.writer(open(filename, 'wb'), dialect='excel')
 
 packed = PackedSamples.objects.select_related().filter(
-    fk_TrayName__TrayName = "RT_KI_03")
+    fk_TrayName__TrayName__in=['KI12TRAY8', 'KI12TRAY9', 'KI12TRAY10',
+                               'KI12TRAY11', 'KI12TRAY12', 'KI12TRAY13',
+                               'KI12TRAY14', 'KI12TRAY15']
+                               )
 
 row = [
     "Tray",

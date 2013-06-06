@@ -67,9 +67,9 @@ fg_cnt = dis.values(guild).annotate(guild_count = Count(guild))
 num_fg = (fg_cnt.count()-1)
 print num_fg
 
-for i in range(0, num_fg):
-    count = fg_cnt[i]['guild_count']
-    fg = fg_cnt[i][guild]
+for fg in fg_cnt:
+    count = fg['guild_count']
+    fg = fg[guild]
     print " > %s: %s" % (fg, count)
 
     row = [
