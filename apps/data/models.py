@@ -23,6 +23,10 @@ class Specimens(models.Model):
     DateEntered = models.DateTimeField(auto_now_add=True)
     CollectionNotes = models.TextField(null=True, blank=True)
     DateCollected = models.DateField(null=True, blank=True)
+    # Where this field was null or blank in the original spreadsheets the year 
+    # with the date of January 1st #(e.g., 2010-01-01) was added so that queries
+    # can be done on collections by year. This date was selected to be 
+    # distinguishable from valid dates where they exist.
     DepthCollected = models.CharField(max_length=255, null=True, blank=True)
     # measured in feet!
     
@@ -93,8 +97,9 @@ class Dissections(models.Model):
         if self.wt > 32768 and self.wt <= 65536:
             return "32.77 - 65.54 kg"  
         if self.wt > 65536 and self.wt <= 131072:
-            return "65.54 - 131.07 kg"  
-        return "No Value" 
+            return "65.54 - 131.07 kg" 
+        else: 
+            return "No Value" 
 
     DateDissected = models.DateField(null=True, blank=True)
     DateEntered = models.DateField(auto_now_add=True) ## CHANGE after imports #######
@@ -149,7 +154,7 @@ class Preprocessings(models.Model):
     
     DateWashDry = models.DateField(null=True, blank=True)
     PreppedBy = models.CharField(max_length=255, null=True, blank=True)
-    PrepEntered = models.CharField(max_length=255, null=True, blank=True,
+    EnteredBy = models.CharField(max_length=255, null=True, blank=True,
         verbose_name="prep entered by")
     DateGround = models.DateField(null=True, blank=True)
     DryingMethod = models.CharField(max_length=255)
@@ -209,6 +214,8 @@ class Results(models.Model):
     Lab = models.CharField(max_length=255)
     DateProcessed = models.DateField(null=True, blank=True)
     # date_processed unnecessary? comment out?
+    ReliableResult = models.NullBooleanField()
+
     def __unicode__(self):
         return u'%s result' % (self.fk_Packed.fk_Sample.SampleID)
 

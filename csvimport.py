@@ -39,7 +39,7 @@ logging.basicConfig(level=logging.INFO)
 
 def shitty_date_conversion(dt_str, blank=False):
     dt = None
-
+    
     try:
         dt = datetime.strptime(dt_str, "%d-%b-%y")
     except:
@@ -59,7 +59,7 @@ def shitty_date_conversion(dt_str, blank=False):
                             dt = datetime.strptime(dt_str, "%d-%m-%Y")
                         except:
                             pass
-
+    
     if not dt and not blank:
         raise Exception('%s is a shitty date' % dt_str)
     return dt
@@ -514,44 +514,46 @@ def rt2010_spec_import():
         for row in csvreader:
             line_number += 1
             spp = row['sp']
-            OldID1 = row['old.ID.code']
-            SpecimenID = row['ID.code']
-            DateCollected = row['date.collected']
-            Site = row['site']
-            DepthCollected = row['depth.collected']
-            Notes = row['notes']
+            old_id1 = row['old.ID.code']
+            specimen_id = row['ID.code']
+            date_collected = row['date.collected']
+            site = row['site']
+            depth_collected = row['depth.collected']
+            notes = row['notes']
 
+
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2010-01-01'
 
             # FK lookups:
-            if Site == '' or Site == 'NA':
-                Site = 'Site Not Certain'
+            if site == '' or site == 'NA':
+                site = 'Site Not Certain'
 
-            if DepthCollected == 'NA':
-                DepthCollected = None
+            if depth_collected == 'NA':
+                depth_collected = None
 
             if spp == 'TURF':
                 try:
                     sp = Species.objects.get(SpeciesCode=spp)
+                    site = Sites.objects.get(SiteName=site)
                     # print spp
                 except ObjectDoesNotExist as e:
-                    logging.warn("%s:%s spp %s does not exist" % (filename, line_number, spp
+                    logging.warn("%s:%s %s" % (line_number, spp, e
                     ))
             else:
                 try:
-                    site = Sites.objects.get(SiteName=Site)
+                    site = Sites.objects.get(SiteName=site)
                     sp = Species.objects.get(ScientificName=spp)
                 
                 except Exception as e:
                     logging.warn('%s:%s %s' % (filename, line_number, e))
                 
-            
-            try:
-                meth = CollectionMethods.objects.get(Method=CollectionMethod)
-            except:
-                meth = None
+                except ObjectDoesNotExist as e:
+                    logging.warn("%s:%s %s" % (line_number, specimen_id, e
+                ))
 
-
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
+                
 
 
             # assigning values:
@@ -559,11 +561,11 @@ def rt2010_spec_import():
                 spe, created = Specimens.objects.get_or_create(
                     fk_Site=site,
                     fk_Species=sp,
-                    SpecimenID=SpecimenID,
-                    OldID1=OldID1,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected,
-                    DepthCollected=DepthCollected
+                    SpecimenID=specimen_id,
+                    OldID1=old_id1,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected,
+                    DepthCollected=depth_collected
                 )
 
                 if created:
@@ -571,7 +573,7 @@ def rt2010_spec_import():
 
             except IntegrityError:
                 logging.error("%s:%s %s is not unique" % (
-                    filename, line_number, SpecimenID
+                    filename, line_number, specimen_id
                 ))
             except Exception as e:
                 logging.error("%s:%s Exception: %s" % (
@@ -586,39 +588,39 @@ def cw1_spec_import():
         for row in csvreader:
             line_number += 1
             spp = row['sp']
-            OldID1 = row['cw.old.ID']
-            SpecimenID = row['ID']
-            DateCollected = row['date.collected']
-            Site = row['site']
-            DepthCollected = row['depth.ft']
-            CollectionMethod = row['method']
-            CollectedBy = row['collected.by']
-            Notes = row['notes']
+            old_id1 = row['cw.old.ID']
+            specimen_id = row['ID']
+            date_collected = row['date.collected']
+            site = row['site']
+            depth_collected = row['depth.ft']
+            collection_method = row['method']
+            collected_by = row['collected.by']
+            notes = row['notes']
             sex = row['sex']
 
 
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2010-01-01'
+
             # FK lookups:
-            if Site == '':
-                Site = 'Site Not Certain'
+            if site == '':
+                site = 'Site Not Certain'
 
             try:
-                site = Sites.objects.get(SiteName=Site)
+                site = Sites.objects.get(SiteName=site)
                 sp = Species.objects.get(ScientificName=spp)
             except Exception as e:
                 logging.warn('%s:%s %s' % (filename, line_number, e))          
 
             try:
-                meth = CollectionMethods.objects.get(Method=CollectionMethod)
+                meth = CollectionMethods.objects.get(Method=collection_method)
             except:
                 meth = None
 
-
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
             
-            if DepthCollected == 'NA' or DepthCollected == '?':
-                DepthCollected = None
-            elif DepthCollected.find('m') == -1:
-                DepthCollected += 'ft'
+            if depth_collected == 'NA' or depth_collected == '?':
+                depth_collected = None
 
             # assigning values:
             try:
@@ -626,13 +628,13 @@ def cw1_spec_import():
                     fk_Site=site,
                     fk_Species=sp,
                     fk_Method=meth,
-                    SpecimenID=SpecimenID,
-                    CollectedBy=CollectedBy,
+                    SpecimenID=specimen_id,
+                    CollectedBy=collected_by,
                     Sex=sex,
-                    OldID1=OldID1,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected,
-                    DepthCollected=DepthCollected
+                    OldID1=old_id1,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected,
+                    DepthCollected=depth_collected
                 )
 
                 if created:
@@ -640,7 +642,7 @@ def cw1_spec_import():
 
             except IntegrityError:
                 logging.error("%s:%s %s is not unique" % (
-                    filename, line_number, SpecimenID
+                    filename, line_number, specimen_id
                 ))
             except Exception as e:
                 logging.error("%s:%s Exception: %s" % (
@@ -656,24 +658,28 @@ def cw2_spec_import():
         for row in csvreader:
             line_number += 1
             spp = row['sp']
-            SpecimenID = row['ID']
-            DateCollected = row['Date collected']
-            Site = row['Site']
-            DepthCollected = row['Depth (ft)']
-            CollectionMethod = row['Method']
-            CollectedBy = row['collector']
-            Notes = row['Notes']
+            specimen_id = row['ID']
+            date_collected = row['Date collected']
+            site = row['Site']
+            depth_collected = row['Depth (ft)']
+            collection_method = row['Method']
+            collected_by = row['collector']
+            notes = row['Notes']
             sex = row['Sex']
 
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2010-01-01'
+
             # FK lookups:
-            if Site == '':
-                Site = 'Site Not Certain'
+            if site == '':
+                site = 'Site Not Certain'
 
             if spp == 'Chromis margaritifer':
-                Notes = Notes + ". Also note that all samples for Chromis margaritifer were lost from the Stanford freezer, so there are no subsequent processing or isotope data for these fish"
+                notes = notes + ". Also note that all samples for Chromis margaritifer were lost from the Stanford freezer, so there are no subsequent processing or isotope data for these fish"
 
             try:
-                site = Sites.objects.get(SiteName=Site)
+                site = Sites.objects.get(SiteName=site)
                 sp = Species.objects.get(ScientificName=spp)
 
                 if sp is None:
@@ -684,17 +690,13 @@ def cw2_spec_import():
                 # logging.warn('%s:%s %s' % (filename, line_number, e))
 
             try:
-                meth = CollectionMethods.objects.get(Method=CollectionMethod)
+                meth = CollectionMethods.objects.get(Method=collection_method)
             except:
                 meth = None
 
-
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
             
-            if DepthCollected == 'NA' or DepthCollected =='?':
-                DepthCollected = None
-            elif DepthCollected.find('m') == -1:
-                DepthCollected += 'ft'
+            if depth_collected == 'NA' or depth_collected =='?':
+                depth_collected = None
 
             # assigning values:
             try:
@@ -702,12 +704,12 @@ def cw2_spec_import():
                     fk_Site=site,
                     fk_Species=sp,
                     fk_Method=meth,
-                    SpecimenID=SpecimenID,
-                    CollectedBy=CollectedBy,
+                    SpecimenID=specimen_id,
+                    CollectedBy=collected_by,
                     Sex=sex,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected,
-                    DepthCollected=DepthCollected
+                    CollectionNotes=notes,
+                    DateCollected=date_collected,
+                    DepthCollected=depth_collected
                 )
 
                 if created:
@@ -733,17 +735,21 @@ def kif11_spec_import():
         for row in csvreader:
             line_number += 1
             spp = row['sp.code']
-            SpecimenID = row['ID']
-            DateCollected = row['date.collected']
-            Site = row['site']
-            Notes = row['Notes']
+            specimen_id = row['ID']
+            date_collected = row['date.collected']
+            site = row['site']
+            notes = row['Notes']
+
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2011-01-01'
 
             # FK lookups:
-            if Site == '':
-                Site = 'Site Not Certain'
+            if site == '':
+                site = 'Site Not Certain'
 
             try:
-                site = Sites.objects.get(SiteName=Site)
+                site = Sites.objects.get(SiteName=site)
                 sp = Species.objects.get(SpeciesCode=spp)
             except Exception as e:
                 logging.warn('%s:%s %s' % (filename, line_number, e))
@@ -751,16 +757,15 @@ def kif11_spec_import():
             if sp == False:
                 print ('%s %s' % (line_number, spp))
 
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
 
             # assigning values:
             try:
                 spe, created = Specimens.objects.get_or_create(
                     fk_Site=site,
                     fk_Species=sp,
-                    SpecimenID=SpecimenID,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected
+                    SpecimenID=specimen_id,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected
                 )
                 
                 if created:
@@ -768,7 +773,7 @@ def kif11_spec_import():
 
             except IntegrityError:
                 logging.error(" line: %s:%s is not unique" %
-                    (line_number, SpecimenID
+                    (line_number, specimen_id
                 ))
                 #logging.error("%s:%s %s is not unique" % (
                 #    filename, line_number, SpecimenID
@@ -787,34 +792,35 @@ def kif12_spec_import(filename='/Users/jillian/Dropbox/Stable isotope database/i
         for row in csvreader:
             line_number += 1
             spp = row['species']
-            SpecimenID = row['ID.code']
-            DateCollected = row['date.collected']
-            Site = row['site']
-            Notes = row['notes']
+            specimen_id = row['ID.code']
+            date_collected = row['date.collected']
+            site = row['site']
+            notes = row['notes']
+
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2012-01-01'
+
 
             # FK lookups:
-            if Site == '':
-                Site = 'Site Not Certain'
+            if site == '':
+                site = 'Site Not Certain'
 
             try:
-                site = Sites.objects.get(SiteName=Site)
+                site = Sites.objects.get(SiteName=site)
                 sp = Species.objects.get(SpeciesCode=spp)
 
             except Exception as e:
                 logging.warn('%s:%s %s %s' % (filename, line_number, spp, e))
-
-
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
-
 
             # assigning values:
             try:
                 spe, created = Specimens.objects.get_or_create(
                     fk_Site=site,
                     fk_Species=sp,
-                    SpecimenID=SpecimenID,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected
+                    SpecimenID=specimen_id,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected
                 )
 
                 if created:
@@ -822,7 +828,7 @@ def kif12_spec_import(filename='/Users/jillian/Dropbox/Stable isotope database/i
 
             except IntegrityError:
                 logging.error(" line: %s:%s is not unique" %
-                    (line_number, SpecimenID
+                    (line_number, specimen_id
                 ))
 
             #except Exception as e:
@@ -831,6 +837,7 @@ def kif12_spec_import(filename='/Users/jillian/Dropbox/Stable isotope database/i
             #    ))
                 #raise e
 
+"""
 def bz_fish_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv'):
 
     with open(filename, 'rU') as csvfile:
@@ -839,8 +846,10 @@ def bz_fish_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
         for row in csvreader:
             line_number += 1
             spp = row['Species']
-            SpecimenID = row['code']
-            Notes = row['Specimen Notes']
+            specimen_id = row['code']
+            notes = row['Specimen Notes']
+
+            date_collected = '2009-01-01'
 
             # FK lookups:
             site = 'Site Not Certain'
@@ -857,8 +866,9 @@ def bz_fish_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
                 spe, created = Specimens.objects.get_or_create(
                     fk_Site=site,
                     fk_Species=sp,
-                    SpecimenID=SpecimenID,
-                    CollectionNotes=Notes
+                    SpecimenID=specimen_id,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected
                 )
 
                 if created:
@@ -866,8 +876,9 @@ def bz_fish_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
 
             except IntegrityError:
                 logging.error(" line: %s:%s is not unique" %
-                    (line_number, SpecimenID
+                    (line_number, specimen_id
                 ))
+"""
 
 def PP_2011_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_PP_collections2.csv'):
     
@@ -877,34 +888,35 @@ def PP_2011_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
         for row in csvreader:
             line_number += 1
             spp = row['SpeciesCode']
-            SpecimenID = row['ID.code']
-            DateCollected = row['date.collected']
-            Site = row['site']
-            Notes = row['notes']
+            specimen_id = row['ID.code']
+            date_collected = row['date.collected']
+            site = row['site']
+            notes = row['notes']
 
             # FK lookups:
-            if Site == '' or Site == 'NA':
-                Site = 'Site Not Certain'
+            if site == '' or site == 'NA':
+                site = 'Site Not Certain'
 
             try:
-                site = Sites.objects.get(SiteName=Site)
+                site = Sites.objects.get(SiteName=site)
                 sp = Species.objects.get(SpeciesCode=spp)
 
             except Exception as e:
                 logging.warn('%s %s %s' % (line_number, spp, e))
 
 
-            DateCollected = shitty_date_conversion(DateCollected, blank=True)
-
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2011-01-01'
 
             # assigning values:
             try:
                 spe, created = Specimens.objects.get_or_create(
                     fk_Site=site,
                     fk_Species=sp,
-                    SpecimenID=SpecimenID,
-                    CollectionNotes=Notes,
-                    DateCollected=DateCollected
+                    SpecimenID=specimen_id,
+                    CollectionNotes=notes,
+                    DateCollected=date_collected
                 )
 
                 if created:
@@ -912,8 +924,7 @@ def PP_2011_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
 
             except IntegrityError:
                 logging.error(" line: %s:%s is not unique" %
-                    (line_number, SpecimenID
-                ))
+                    (line_number, specimen_id))
 
             #except Exception as e:
             #    logging.error("%s:%s Exception: %s" % (
@@ -930,19 +941,28 @@ def Uvic_PP_import(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
             sample_id = row['ID']
             species = row['Species']
             site = row['Site']
-
+            date_collected = row['Collection date']
             specimen_id = sample_id[0:8]
+
+            date_collected = shitty_date_conversion(date_collected, blank=True)
+            if date_collected is None:
+                date_collected = '2011-01-01'
 
         # FK lookups:
             species = Species.objects.get(SpeciesCode=species)
             site = Sites.objects.get(SiteName=site)
 
         # assigning values:
-            pp, created = Specimens.objects.get_or_create(
-                SpecimenID=specimen_id,
-                fk_Species=species,
-                fk_Site=site
-            )
+            try:
+                pp, created = Specimens.objects.get_or_create(
+                    SpecimenID=specimen_id,
+                    fk_Species=species,
+                    fk_Site=site,
+                    DateCollected=date_collected
+                )
+            except IntegrityError as e:
+                logging.warn(" line: %s specimen %s %s" % 
+                    (line_number, specimen_id, e))
 
             if created:
                 pp.save()
@@ -1574,10 +1594,11 @@ def shark_spec_import():
 
             try:
                 spec, created = Specimens.objects.get_or_create(
-                    fk_Site = site,
-                    fk_Species = spp,
-                    SpecimenID = specimen_id,
-                    CollectionNotes = collection_notes
+                    fk_Site=site,
+                    fk_Species=spp,
+                    SpecimenID=specimen_id,
+                    CollectionNotes=collection_notes,
+                    DateCollected=date_surveyed
                     )
 
                 if created:
@@ -1586,15 +1607,18 @@ def shark_spec_import():
             except IntegrityError as e:
                 logging.warn("line: %s specimen %s %s" % 
                     (line_number, specimen_id, e))
+                continue
+
             try:
                 spec_id = Specimens.objects.get(SpecimenID = specimen_id)
 
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s' % (line_number, e))
+                continue
             
 
             try:
-                sh_spec, created = SharkSpecimens.objects.get_or_create(
+                sh_spec, created = SharkHhsJoins.objects.get_or_create(
                     fk_SpecimenID = spec_id,
                     fk_HHS = hhs
                     )
@@ -1756,7 +1780,7 @@ def shark_samp_prep_import():
                     fk_Treatment = treat,
                     DateWashDry = date_wd,
                     PreppedBy = prepped_by,
-                    PrepEntered = prepped_by,
+                    EnteredBy = prepped_by,
                     DateGround = date_ground,
                     DryingMethod = drying_method,
                     DryingTime = drying_hours
@@ -1813,7 +1837,7 @@ def prep_import():
                     fk_Treatment=treatment,
                     DateWashDry=date_wash_dry,
                     PreppedBy=prepped_by,
-                    PrepEntered=entered_by,
+                    EnteredBy=entered_by,
                     DryingMethod=drying_method,
                     DryingTime=drying_time,
                     Notes=notes
@@ -1839,7 +1863,10 @@ def ki_2011_pp_prep_import():
             sample_type = row['Sample Type']
             prep_notes = row['notes']
             sample_notes = row['sample_notes']
-
+            processed_by = row['processed.by']
+            drying_method = row['drying method']
+            drying_hours = row['drying.hours']
+            entered_by = row['entered.by']
 
             date_wd = shitty_date_conversion(date_wash_dry, blank=True)
 
@@ -1851,6 +1878,7 @@ def ki_2011_pp_prep_import():
                 continue
 
         # Sample lookup or creation:
+            no_sample = False
             try:
                 sample = Samples.objects.get(SampleID = sample_id)
 
@@ -1858,31 +1886,38 @@ def ki_2011_pp_prep_import():
                 #logging.warn('line %s: Sample: %s does not exist' 
                  #   % (line_number, sample_id))
                 #sample = None
+                no_sample = True
 
-                if e:
+            if no_sample == True:
 
             # Sample creation lookups:
-                    try:
-                        specimen = Specimens.objects.get(SpecimenID = spec_id)
-                        stype = SampleTypes.objects.get(TypeCode = sample_type)
+                try:
+                    specimen = Specimens.objects.get(SpecimenID=spec_id)
+                    stype = SampleTypes.objects.get(TypeCode=sample_type)
 
-                        s, created = Samples.objects.get_or_create(
-                            SampleID = sample_id,
-                            fk_Specimen = specimen,
-                            fk_SampleType =  stype,
-                            Notes = sample_notes
-                            )
+                    s, created = Samples.objects.get_or_create(
+                        SampleID=sample_id,
+                        fk_Specimen=specimen,
+                        fk_SampleType=stype,
+                        Notes=sample_notes
+                        )
 
-                        if created:
-                            print('sample created: %s' % sample_id)
-                            s.save()
+                    if created:
+                        print('sample created: %s' % sample_id)
+                        s.save()
 
-                    except ObjectDoesNotExist as e:
-                        logging.warn('line %s: Specimen: "%s" %s' 
-                            % (line_number, spec_id, e))
+                except ObjectDoesNotExist as e:
+                    logging.warn('line %s: Specimen: "%s" %s' 
+                        % (line_number, spec_id, e))
 
-
+                try:
+                    sample = Samples.objects.get(SampleID=sample_id)
+                
+                except ObjectDoesNotExist as e:
+                    logging.warn('line %s: sample "%s" %s' 
+                        % (line_number, sample_id, e))
         # Prep FK lookups:
+
             try:
                 treatment = Treatments.objects.get(TreatmentCode=treatment)
             except ObjectDoesNotExist as e:
@@ -1891,10 +1926,14 @@ def ki_2011_pp_prep_import():
 
             try:
                 prep, created = Preprocessings.objects.get_or_create(
-                    fk_Sample = sample,
-                    fk_Treatment = treatment,
-                    DateWashDry = date_wd,
-                    Notes = prep_notes
+                    fk_Sample=sample,
+                    fk_Treatment=treatment,
+                    DateWashDry=date_wd,
+                    Notes=prep_notes,
+                    PreppedBy=processed_by,
+                    DryingMethod=drying_method,
+                    DryingTime=drying_hours,
+                    EnteredBy=entered_by
                     )
 
                 if created:
@@ -1966,7 +2005,7 @@ def uvic_prep_import():
                     prep.save()
             except IntegrityError as e:
                 logging.warn("line: %s fk_Sample is not unique: %s" % (line_number, sample))
-
+"""
 def BZ_prep_import():
     filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv'
     with open(filename, 'rU') as csvfile:
@@ -1987,6 +2026,7 @@ def BZ_prep_import():
 
             if created:
                 prep.save()
+"""
 
 def uvic_FISH_prep_import():
     filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/New_Fish Prep Data Entry Sheet.csv'
@@ -2050,7 +2090,7 @@ def uvic_FISH_prep_import():
                     DryingTime=drying_time,
                     DateGround=date_ground,
                     PreppedBy=by,
-                    PrepEntered=entered,
+                    EnteredBy=entered,
                     Notes=notes,
                 )
 
@@ -2082,6 +2122,8 @@ def uvic_2011_packed_import():
 
             if sample_type == 'STANDARD':
                 continue
+            if sample_type == 'standard':
+                continue
 
             good_date_packed = shitty_date_conversion(date_packed, blank=True)
 
@@ -2089,12 +2131,13 @@ def uvic_2011_packed_import():
                 sample = Samples.objects.get(SampleID=sample_id)
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s %s' % (line_number, sample_id, e))
+                continue
 
             try:
                 tray = Trays.objects.get(TrayName=tray_name)
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s %s' % (line_number, tray_name, e))
-
+                continue
 
             if cap_wt.strip() == '':
                 cap_wt = None
@@ -2155,12 +2198,14 @@ def sfu_packed_import():
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s does not exist' % 
                     (line_number, sample_id))
+                continue
 
             try:
                 tray = Trays.objects.get(TrayName=tray_name)
             except ObjectDoesNotExist as e:
                 logging.warn('line %s: %s does not exist' % 
                     (line_number, tray_name))
+                continue
 
             if sample_weight.strip() == '':
                 sample_weight = None
@@ -2228,12 +2273,14 @@ def uvic_2012_packed_import():
                 except ObjectDoesNotExist as e:
                     logging.warn("line: %s, %s %s" % 
                         (line_number, sample_id, e))
+                    continue
 
                 try:
                     tray = Trays.objects.get(TrayName=tray_name)
                 except ObjectDoesNotExist as e:
                     logging.warn('line %s: %s does not exist' % 
                         (line_number, tray_name))
+                    continue
                 
                 try:
                     ps, created = PackedSamples.objects.get_or_create(
@@ -2275,13 +2322,19 @@ def results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/in
                 dN15 = row['dN15']
                 lab = row['lab']
 
+
+                if sample_id is None or sample_id == '':
+                    continue
+
                 trow = tray_position[0]
                 tcol = int(tray_position[1:])
+
 
                 try:
                     sample = Samples.objects.get(SampleID = sample_id)
                 except ObjectDoesNotExist as e:
                     logging.warn("line %s: %s %s" % (line_number, sample_id, e))
+                    continue
 
                 try:
                     tray = Trays.objects.get(TrayName = tray_name)
@@ -2297,6 +2350,7 @@ def results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/in
                         )
                 except ObjectDoesNotExist as e:
                     logging.warn("line %s: %s %s" % (line_number, sample_id, e))
+                    continue
 
                 try:
                     result, created = Results.objects.get_or_create(
@@ -2394,8 +2448,8 @@ def main():
     print '> All KIF12 specimen import'
     kif12_spec_import()
 
-    print '> BZ fish specimen import'
-    bz_fish_spec(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv')
+#    print '> BZ fish specimen import'
+ #   bz_fish_spec(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv')
 
     print '> 2011 PP specimen import'
     PP_2011_spec(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_PP_collections2.csv')
@@ -2433,8 +2487,8 @@ def main():
     print '> UVIC macro preprocessing import'
     uvic_prep_import()
 
-    print '> BZ prep import'
-    BZ_prep_import()
+#    print '> BZ prep import'
+#    BZ_prep_import()
 
     print '> UVIC FISH prep import and sample creation'
     uvic_FISH_prep_import()
@@ -2478,10 +2532,15 @@ def main():
 
     print '---------'
     print '>> Start of results imports'
+    
     print '> SFU old results import'
     results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/consolidated_sfu_results.csv")
+    
     print '> UVic KI12TRAY1-7 import'
-    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/KIF_Tray1-7 data.csv")
+    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/RTKI003_Tray4_KIF_Tray1-7 data.csv")
+
+    print '> UVic KI12TRAY8-14 import'
+    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/Tray8-14data.csv")
 
 
     print ' > Specimen Spare Samples'

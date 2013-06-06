@@ -45,3 +45,4 @@ csv_data/*
 *.csv
 .DS_Store
 *.pdf
+*.xlsx

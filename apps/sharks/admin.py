@@ -52,7 +52,7 @@ class SHSAMPadmin(admin.ModelAdmin):
 admin.site.register(SharkPieces, PIECEadmin)
 admin.site.register(SharkStates, STATEadmin)
 
-admin.site.register(SharkSpecimens, SHSPECadmin)
+admin.site.register(SharkHhsJoins, SHSPECadmin)
 admin.site.register(SharkDissections, SHDISadmin)
 admin.site.register(SharkSamples, SHSAMPadmin)
 

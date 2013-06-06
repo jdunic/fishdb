@@ -287,7 +287,7 @@ class Preprocessings(models.Model):
     
     DateWashDry = models.DateField(null=True, blank=True)
     PreppedBy = models.CharField(max_length=255, null=True, blank=True)
-    PrepEntered = models.CharField(max_length=255, null=True, blank=True,
+    EnteredBy = models.CharField(max_length=255, null=True, blank=True,
         verbose_name="prep entered by")
     DateGround = models.DateField(null=True, blank=True)
     DryingMethod = models.CharField(max_length=255)
@@ -420,7 +420,7 @@ class SharkSamples(models.Model):
     def __unicode__(self):
         return u'shark sample: %s' % (self.fk_Sample.SampleID)
 
-class SharkSpecimens(models.Model): # This table allows sharks collected from
+class SharkHhsJoins(models.Model): # This table allows sharks collected from
     # household surveys to be paired with the appropriate hhs data. 
     fk_SpecimenID = models.ForeignKey('Specimens')
     fk_HHS = models.ForeignKey('HHS', null=True, blank=True)

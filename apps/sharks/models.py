@@ -22,7 +22,7 @@ class SharkStates(models.Model): # type of treatment: e.g., Fresh, sun-dried,
         return u'%s' % (self.State)
 
 
-class SharkSpecimens(models.Model): # This table allows sharks collected from
+class SharkHhsJoins(models.Model): # This table allows sharks collected from
     # household surveys to be paired with the appropriate hhs data. 
     fk_SpecimenID = models.ForeignKey(Specimens)
     fk_HHS = models.ForeignKey(HHS, null=True, blank=True)

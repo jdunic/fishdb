@@ -18,11 +18,11 @@ here = os.path.dirname(__file__)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': join(DJANGO_ROOT, '..', 'db/sqlite3.db'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'fishdb',                # Or path to database file if using sqlite3.
+        'USER': '',                 # Not used with sqlite3.
+        'PASSWORD': '',          # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -123,15 +123,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'apps.data',
-    'apps.helpers',
-    'apps.sharks',
-    'apps.species',
-
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'django_extensions',
-    'data_exports'
+    'data_exports',
+
+    'apps.data',
+    'apps.helpers',
+    'apps.sharks',
+    'apps.species'
 
 )
 

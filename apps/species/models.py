@@ -92,8 +92,8 @@ class Species(models.Model): # Taxonomic information
     # species types: fish, macro, shark, urchin, turtle, lobster, worm
 
 ###### ADD Many-to-Many??????
-    Habitats = models.ManyToManyField('FishingHabitats')
-    Methods = models.ManyToManyField('FishingMethods')
+    Habitats = models.ManyToManyField('FishingHabitats', null=True, blank=True)
+    Methods = models.ManyToManyField('FishingMethods', null=True, blank=True)
 
     def habitat_names(self):
         return ', '.join([a.Habitats for a in self.FishingHabitats.all()])

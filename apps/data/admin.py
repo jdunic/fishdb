@@ -15,7 +15,9 @@ class SPECadmin(admin.ModelAdmin):
     list_display = ('SpecimenID', 'get_species', 'get_site_name', 
         'DepthCollected', 'DateCollected', 'OldID1', 'CollectionNotes', 'id',)
 
-    list_filter = ['fk_Site__SiteName','fk_Species__Genus']
+    list_filter = ['fk_Species__fk_Type__Type',
+                   'fk_Site__SiteName',
+                   'fk_Species__Genus']
 
     search_fields = ['SpecimenID']
 
@@ -33,6 +35,8 @@ class DISadmin(admin.ModelAdmin):
     list_display = ('get_specID', 'get_species', 'SizeClass', 'wt', 'SL', 'TL', 
         'FL', 'gh', 'gw', 'PreySize', 'StomachSample', 'StomachContents', 
         'Notes','DissectedBy',)
+
+    search_fields = ['fk_Specimen__SpecimenID']
 
 
 class SAMPadmin(admin.ModelAdmin):
@@ -54,13 +58,14 @@ class SAMPadmin(admin.ModelAdmin):
     get_type.short_description = "Sample type"
 
     list_display = ('SampleID', 'get_specID', 'get_species', 'get_treat', 
-        'get_type', 'OldSampleID', 'Notes',)
+        'get_type', 'OldSampleID', 'Notes', 'id',)
 
     list_filter = ['fk_Specimen__fk_Species__fk_Type__Type', 
                    'preprocessings__fk_Treatment__TreatmentCode'
                    ]
 
     search_fields = ['SampleID', 
+                     'OldSampleID',
                      'fk_SampleType__SampleType',
                      'fk_Specimen__fk_Species__SpeciesCode',
                      'preprocessings__fk_Treatment__TreatmentCode']
@@ -80,7 +85,8 @@ class PREPadmin(admin.ModelAdmin):
     list_display = ('get_sampID', 'get_treat', 'DateWashDry', 'DateGround', 
         'Notes',)
 
-    search_fields = ['fk_Sample__SampleID']
+    search_fields = ['fk_Sample__SampleID',
+                     'fk_Sample__fk_Specimen__fk_Species__fk_Type__Type']
 
 
 class PSadmin(admin.ModelAdmin):
@@ -102,17 +108,23 @@ class REadmin(admin.ModelAdmin):
     def get_sampID(self, o):
         return '%s' % o.fk_Packed.fk_Sample.SampleID
     get_sampID.short_description = "SampleID"
+    get_sampID.admin_order_field = "fk_Packed__fk_Sample__SampleID"
 
     def get_tray(self, o):
         return '%s' % o.fk_Packed.fk_TrayName.TrayName
     get_tray.short_description = "Tray"
 
-    list_display = ('get_sampID', 'get_tray', 'd13C', 'd15N', 'Lab',)
+    list_display = ('get_sampID', 'get_tray', 'd13C', 'd15N', 'Lab', 
+                    'ReliableResult',)
 
     search_fields = ['fk_Packed__fk_Sample__SampleID',
                      'fk_Packed__fk_TrayName__TrayName',
                      'Lab'
                      ]
+
+    list_filter = ['fk_Packed__fk_Sample__fk_Specimen__fk_Species__fk_Type__Type',
+                   'ReliableResult']
+
 
 
 
