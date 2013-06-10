@@ -57,8 +57,14 @@ class SAMPadmin(admin.ModelAdmin):
         return '%s' % o.fk_SampleType.SampleType
     get_type.short_description = "Sample type"
 
+    def get_packed(self, o):
+        return ', '.join(o.packedsamples_set.all().values_list('TrayRow', flat=True))
+    get_packed.short_description = "packed"
+
+#return ', '.join(o.Habitats.all().values_list('Habitat', flat=True))
+
     list_display = ('SampleID', 'get_specID', 'get_species', 'get_treat', 
-        'get_type', 'OldSampleID', 'Notes', 'id',)
+        'get_type', 'OldSampleID', 'Notes', 'id', 'get_packed',)
 
     list_filter = ['fk_Specimen__fk_Species__fk_Type__Type', 
                    'preprocessings__fk_Treatment__TreatmentCode'
@@ -102,6 +108,9 @@ class PSadmin(admin.ModelAdmin):
     list_display = ('get_sampID', 'get_tray', 'TrayRow', 'TrayColumn', 'Notes', 'id', )
 
     search_fields = ['fk_Sample__SampleID','fk_TrayName__TrayName']
+
+    list_filter = ['fk_Sample__preprocessings__fk_Treatment__TreatmentCode',
+                   'fk_Sample__fk_Specimen__fk_Species__fk_Type__Type']
 
 
 class REadmin(admin.ModelAdmin):
