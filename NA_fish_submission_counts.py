@@ -120,11 +120,14 @@ for a in A:
 ### B ### - Will need washing/drying:
 # 3 - get all of the fish that have no 'NA' samples but have been dissected
 
-# gets 'NA' samples
-na_samples = samples.select_related() \
-    .filter(preprocessings__fk_Treatment__TreatmentCode='NA').distinct()
+# gets all of the unique specimens that have 'NA' samples
+na_samp = fish.Samples.select_related() \
+    .filter(preprocessings__fk_Treatment__TreatmentCode='NA')
 
-B = fish.exclude(samples__in=A).exclude(samples__in=na_samples)
+# Get all specimens that:
+# 1) Are not likely to be missing dissections
+# 2) Do not already have NA samples prepared
+B = fish.exclude(samples__in=A).exclude(id__in=na_samp).distinct('fk_Specimen')
 print ' > Specimens that do not have "NA" samples: %s' % B.count()
 
 row = [
@@ -180,13 +183,16 @@ for b in B:
 
 ### C ###
 # 4 - get fish that do have 'NA' samples but which have not been packed
-packed = PackedSamples.objects.select_related() \
-    .distinct('fk_Sample__fk_Specimen')
+# Gets all packed samples
+packed = PackedSamples.objects.select_related()
 
-# gets fish specimens that have 'NA' samples:
-na_fish = fish.filter(samples__in=na_samples)
+# Gets fish specimens that have 'NA' samples:
+na_fish = fish.filter(samples__in=na_spec)
 
-C = na_fish.exclude(samples__packedsamples__in=packed)
+# Get all fish that:
+# Have 'NA' samples but which are not yet packed 
+C = na_fish.exclude(samples__packedsamples__in=packed) \
+    .distinct('id')
 print '> Specimens have "NA" samples but which have not been packed yet: %s' % \
 C.count()
 
@@ -255,11 +261,12 @@ for c in C:
 ### D ###
 # 5 - get fish that have packed 'NA' samples but which have not yet been 
 # submitted
-# gets packed 'NA' samples that do not yet have results:
-results = Results.objects.all()
-na_packed = na_samples.filter(packedsamples__in=packed)
 
-no_results = na_samples.exclude(packedsamples__in=results)
+packed = PackedSamples.objects.select_related().all()
+results = Results.objects.select_related().all()
+
+na_packed = na_spec.filter(samples__packedsamples__in=packed)
+not_sub = na_spec.exclude(samples__packedsamples__in=results)
 
 na_not_submit = na_samples.filter(packedsamples__fk_TrayName__Submitted=False)
 
