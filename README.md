@@ -9,6 +9,10 @@ fishdb
 	mkvirtualenv fishdb_env
 
 	workon fishdb_env
+	
+	pip install django-data-exports  # for graphviz
+	
+	pip install django-extensions  # for graphviz
 
 	pip install -r requirements.txt
 
