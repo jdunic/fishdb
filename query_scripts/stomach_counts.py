@@ -8,7 +8,10 @@ from django.core.management import setup_environ
 from django.db.models import Q, Count
 
 from fishdb import settings
-from fishdb.models import *
+from apps.data.models import *
+from apps.species.models import *
+from apps.helpers.models import *
+
 
 # Setting django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")

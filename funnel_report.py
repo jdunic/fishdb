@@ -19,7 +19,7 @@ date = datetime.now().strftime('%b%d')
 date_y = datetime.now().strftime('%b %d, %Y')
 
 
-filename = "funnel_analysis_%s.csv" % date
+filename = "funnel_list_%s.csv" % date
 
 writer = csv.writer(open(filename, 'wb'), dialect='excel')
 
@@ -174,6 +174,9 @@ not_packed = na_fish.exclude(samples__packedsamples__in=packed).distinct('id')
 
 C = not_packed
 
+writer.writerow([''])
+writer.writerow(['List of specimens that need "NA" samples to be packed'])
+writer.writerow([''])
 row = [
     "specimenID",
     "sampleID",
@@ -209,15 +212,19 @@ for c in C:
 
     size = c.dissections_set.get().SizeClass()
     weight = c.dissections_set.get().wt
+    stomach_sample = c.dissections_set.get().StomachSample
 
     col_notes = c.CollectionNotes
     dis_notes = c.dissections_set.get().Notes
     try:
-        s_note_list = c.samples_set.all().values_list('Notes', flat=True)
-        samp_notes = ', '.join(s_note_list)
-    except TypeError as e:
-        logging.warn("%s" % e)
-        samp_notes = "manually check notes"
+        samp_notes = c.samples_set.get().Notes
+    except MultipleObjectsReturned as e:
+        try:
+            s_note_list = c.samples_set.all().values_list('Notes', flat=True)
+            samp_notes = ', '.join(s_note_list)
+        except TypeError as e:
+            logging.warn("%s" % e)
+            samp_notes = "manually check notes"
     try:
         prep_note_list = c.samples_set.get().preprocessings_set.all() \
             .values_list('Notes', flat=True)
@@ -237,10 +244,10 @@ for c in C:
         sample,
         species,
         sci_name,
-        site,
         fg,
-
         site,
+
+        size,
         weight,
         stomach_sample,
 
@@ -264,6 +271,11 @@ need_submit = na_packed.exclude(samples__packedsamples__results__in=results) \
     .exclude(samples__packedsamples__in=submit)
 
 D = need_submit
+
+
+writer.writerow([''])
+writer.writerow(['List of specimens that have packed "NA" but need to be submitted'])
+writer.writerow([''])
 
 row = [
     "specimenID",
@@ -295,13 +307,27 @@ for d in D:
     species = d.fk_Species.SpeciesCode
     sci_name = d.fk_Species.ScientificName
     site = d.fk_Site.SiteName
-
-    ps = d.samples_set.get().packedsamples_set.all()
-    tray = ps.get().fk_TrayName.TrayName
-    trow = ps.get().TrayRow
-    tcol = ps.get().TrayColumn
-    position = trow + tcol
-
+    try:
+        ps = d.samples_set.get().packedsamples_set.get().fk_Sample.SampleID    
+        #ps_list = d.samples_set.get().packed_samples.all() \
+        #    .values_list('fk_Sample__SampleID', flat=True)
+        #ps = ', '.join(ps_list)
+    except MultipleObjectsReturned as e:
+        try:
+            for s in d.samples_set.get():
+                ps_list = s.packedsamples_set.all() \
+                    .values_list('fk_SampleID__SampleID')
+                ps = ', '.join(ps_list)
+        except MultipleObjectsReturned as e:
+            ps = "see SampleIDs listed"
+    try:
+        tray = ps.get().fk_TrayName.TrayName
+        trow = ps.get().TrayRow
+        tcol = ps.get().TrayColumn
+        position = trow + tcol
+    except AttributeError as e:
+        tray = "look up tray manually"
+        position = "check position manually"
     try:
         fg = d.fk_Species.fk_Guild.GuildCode
     except AttributeError as e:
@@ -333,7 +359,15 @@ for d in D:
         except TypeError as e:
             logging.warn("%s" % e)
             prep_notes = "manually check notes"
-    packed_notes = d.samples_set.get().packedsamples_set.get().Notes
+    try:
+        packed_notes = d.samples_set.get().packedsamples_set.get().Notes
+    except MultipleObjectsReturned as e:
+        try:
+            for s in d.samples_set.all():
+                p_list = s.packedsamples_set.all().values_list('Notes', flat=True)
+                packed_notes = ', '.join(p_list)
+        except TypeError as e:
+            packed_notes = "manually check notes"
 
     row = [
         specimen,

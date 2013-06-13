@@ -63,7 +63,7 @@ fish = Specimens.objects.select_related().filter(
     CollectionNotes__contains='all samples for Chromis margaritifer were lost from the Stanford freezer')
 
 
-### A ### - Probs dissections needed:
+### A ### - Dissections are probably needed:
 # 2 - get all of the fish that have no samples
 # Done by getting all fish specimens that are not found in all samples.
 samples = Samples.objects.select_related()

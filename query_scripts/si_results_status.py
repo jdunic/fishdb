@@ -71,7 +71,7 @@ na_fish.values('fk_Packed__fk_Sample__fk_Specimen__fk_Species__fk_Guild__GuildCo
 na_fish_count
 
 na_fish_count = na_fish \
-order_by('fk_Packed__fk_Sample__fk_Specimen').distinct() \
+.order_by('fk_Packed__fk_Sample__fk_Specimen').distinct() \
 .values('fk_Packed__fk_Sample__fk_Specimen__fk_Species__fk_Guild__GuildCode') \
 .annotate(results_count=Count('id'))
 na_fish_count
