@@ -1391,6 +1391,10 @@ def samp_import(
             if SampleID is None or SampleID == '':
                 continue
 
+        # Set sample notes to be Null if they are empty:
+            if Notes is None or Notes == '' or Notes == ' ':
+                Notes = None
+
         # FK lookup:
             try:
                 specimen = Specimens.objects.get(SpecimenID=SpecimenID)
