@@ -48,3 +48,6 @@ csv_data/*
 *.xlsx
 *.png
 *.xls
+
+*.sublime*
+sublime_project_README.txt
