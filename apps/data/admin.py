@@ -106,7 +106,12 @@ class PSadmin(admin.ModelAdmin):
     get_tray.short_description = "Tray"
     get_tray.admin_order_field = "fk_TrayName__TrayName"
 
-    list_display = ('get_sampID', 'get_tray', 'TrayRow', 'TrayColumn', 'Notes', 'id', )
+    def get_treat(self, o):
+        return '%s' % o.fk_Sample.preprocessings_set.get().fk_Treatment.TreatmentCode
+    get_treat.short_description = "Treatment"
+
+    list_display = ('get_sampID', 'get_tray', 'TrayRow', 'TrayColumn', 'Notes',
+                    'get_treat', 'id', )
 
     search_fields = ['fk_Sample__SampleID','fk_TrayName__TrayName']
 
