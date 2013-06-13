@@ -33,7 +33,8 @@ from apps.sharks.models import *
 from apps.species.models import *
 
 setup_environ(settings)
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")
+DROPBOX_CSV_PATH = os.environ.get("DROPBOX_CSV_PATH")
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -66,7 +67,7 @@ def shitty_date_conversion(dt_str, blank=False):
 
 
 def cm_import():
-    filename = 'csv_data/CollectionMethods.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/CollectionMethods.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -88,7 +89,7 @@ def cm_import():
                 cm.save()
         
 def fh_import():
-    filename = 'csv_data/FishingHabitats.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/FishingHabitats.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -102,7 +103,7 @@ def fh_import():
                 habs.save()
 
 def fm_import():    
-    filename = 'csv_data/FishingMethods.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/FishingMethods.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -116,7 +117,7 @@ def fm_import():
                     meths.save()
 
 def wp_import():
-    filename = 'csv_data/Waypoints.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Waypoints.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -144,7 +145,7 @@ def wp_import():
                 wps.save()
 
 def fg_import():
-    filename = 'csv_data/FunctionalGroups.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/FunctionalGroups.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -162,7 +163,7 @@ def fg_import():
                 g.save()
 
 def lw_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/kx_fish_LW_rels.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "kx_fish_LW_rels.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
 
@@ -222,7 +223,7 @@ def lw_import():
 
 
 def sp_type():
-    filename='csv_data/SpeciesTypes.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/SpeciesTypes.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -232,7 +233,8 @@ def sp_type():
             spt = SpeciesTypes.objects.create(
                 Type=Type) 
 
-def sp_import(filename = 'csv_data/Taxonomies.csv'):
+def sp_import(
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Taxonomies.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -313,7 +315,7 @@ def sp_import(filename = 'csv_data/Taxonomies.csv'):
             line_number += 1
 
 def sites_import():
-    filename = 'csv_data/Sites.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Sites.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -354,7 +356,7 @@ def sites_import():
                 sts.save()
 
 def loc_import():
-    filename = 'csv_data/Locations.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Locations.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -374,7 +376,7 @@ def loc_import():
                 loc.save()
 
 def hhs_import():
-    filename = 'csv_data/HHS.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/HHS.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -395,7 +397,7 @@ def hhs_import():
                 hhs.save()
 
 def stype_import():
-    filename = 'csv_data/SampleTypes.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/SampleTypes.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -413,7 +415,7 @@ def stype_import():
                 st.save()
 
 def treat_import():
-    filename = 'csv_data/Treatments.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Treatments.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -429,7 +431,7 @@ def treat_import():
                 treat.save()
 
 def trays_import():
-    filename = 'csv_data/Trays.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Trays.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -452,7 +454,7 @@ def trays_import():
                 tr.save()
 
 def state_import():
-    filename = 'csv_data/SharkStates.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/SharkStates.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -468,7 +470,7 @@ def state_import():
 
 #### Need to clean this data because there are a lot of species that probably have typos or something.
 def shmjoin_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Fish Names Kir Eng Science Area Method.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "Fish Names Kir Eng Science Area Method.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -507,7 +509,7 @@ def shmjoin_import():
                 logging.warn('spp %s does not exist' % species)
 
 def rt2010_spec_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/RT_dissections10.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "RT_dissections10.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -581,7 +583,7 @@ def rt2010_spec_import():
                 ))
 
 def cw1_spec_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/CW_merged_isotope_dissections2011.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "CW_merged_isotope_dissections2011.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 0
@@ -651,7 +653,7 @@ def cw1_spec_import():
                 raise e
 
 def cw2_spec_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/CW_dis_merged_2012.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "CW_dis_merged_2012.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 0
@@ -728,7 +730,7 @@ def cw2_spec_import():
                 #raise e
 
 def kif11_spec_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_fish_dissections.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "2011_KI_fish_dissections.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 0
@@ -784,7 +786,9 @@ def kif11_spec_import():
             #    ))
                 #raise e
 
-def kif12_spec_import(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/2012_Kiritimati_field_fish_dissections.csv'):
+def kif12_spec_import(
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "2012_Kiritimati_field_fish_dissections.csv")):
     
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
@@ -837,50 +841,9 @@ def kif12_spec_import(filename='/Users/jillian/Dropbox/Stable isotope database/i
             #    ))
                 #raise e
 
-"""
-def bz_fish_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv'):
 
-    with open(filename, 'rU') as csvfile:
-        csvreader = csv.DictReader(csvfile)
-        line_number = 1
-        for row in csvreader:
-            line_number += 1
-            spp = row['Species']
-            specimen_id = row['code']
-            notes = row['Specimen Notes']
-
-            date_collected = '2009-01-01'
-
-            # FK lookups:
-            site = 'Site Not Certain'
-
-            try:
-                site = Sites.objects.get(SiteName=site)
-                sp = Species.objects.get(SpeciesCode=spp)
-
-            except Exception as e:
-                logging.warn('%s:%s %s %s' % (filename, line_number, spp, e))
-
-            # assigning values:
-            try: 
-                spe, created = Specimens.objects.get_or_create(
-                    fk_Site=site,
-                    fk_Species=sp,
-                    SpecimenID=specimen_id,
-                    CollectionNotes=notes,
-                    DateCollected=date_collected
-                )
-
-                if created:
-                    spe.save()
-
-            except IntegrityError:
-                logging.error(" line: %s:%s is not unique" %
-                    (line_number, specimen_id
-                ))
-"""
-
-def PP_2011_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_PP_collections2.csv'):
+def PP_2011_spec(
+    filename = os.path.join(DROPBOX_CSV_PATH, "2011_KI_PP_collections2.csv")):
     
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
@@ -932,7 +895,9 @@ def PP_2011_spec(filename='/Users/jillian/Dropbox/Stable isotope database/input_
             #    ))
                 #raise e
 
-def Uvic_PP_import(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv'):
+def Uvic_PP_import(
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -968,7 +933,8 @@ def Uvic_PP_import(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
                 pp.save()
 
 
-def dis_import_RT10(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/RT_dissections10.csv'):
+def dis_import_RT10(
+    filename = os.path.join(DROPBOX_CSV_PATH, "RT_dissections10.csv")):
 
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
@@ -1040,7 +1006,9 @@ def dis_import_RT10(filename='/Users/jillian/Dropbox/Stable isotope database/inp
             except Exception as e:
                 logging.error("%s:%s %s" % (filename, line_number, e))
 
-def dis_import_CW1(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/CW_merged_isotope_dissections2011.csv'):
+def dis_import_CW1(
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "CW_merged_isotope_dissections2011.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1104,7 +1072,8 @@ def dis_import_CW1(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
             except Exception as e:
                 logging.error("%s:%s %s" % (filename, line_number, e))
 
-def dis_import_CW2(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/CW_dis_merged_2012.csv'):
+def dis_import_CW2(
+    filename = os.path.join(DROPBOX_CSV_PATH, "CW_dis_merged_2012.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1132,7 +1101,9 @@ def dis_import_CW2(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
 
             spp = specimen.fk_Species.SpeciesCode
             if spp == 'CH.MARG':
-                Notes += '. All samples for Chromis Margaritifer were lost from the Stanford freezer, so there are no subsequent processing or isotope data for these fish'
+                Notes += """. All samples for Chromis Margaritifer were lost 
+                from the Stanford freezer, so there are no subsequent processing 
+                or isotope data for these fish"""
 
             if Intestines != 'NA':
                 StomachContents += '. Intestines: %s' % Intestines
@@ -1200,7 +1171,8 @@ def dis_import_CW2(filename='/Users/jillian/Dropbox/Stable isotope database/inpu
                 pass
                 #logging.error("%s:%s %s" % (filename, line_number, e))
 
-def dis_import_KI11(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_fish_dissections.csv'):
+def dis_import_KI11(
+    filename = os.path.join(DROPBOX_CSV_PATH, "2011_KI_fish_dissections.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1297,7 +1269,9 @@ def dis_import_KI11(filename='/Users/jillian/Dropbox/Stable isotope database/inp
                 continue
 
 
-def dis_import_KI12(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/2012_Kiritimati_field_fish_dissections.csv'):
+def dis_import_KI12(
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "2012_Kiritimati_field_fish_dissections.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1404,7 +1378,8 @@ def dis_import_KI12(filename='/Users/jillian/Dropbox/Stable isotope database/inp
                     logging.error("%s:%s %s" % (filename, line_number, e))
 
 
-def samp_import(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KI_SI_sample_Index.csv'):
+def samp_import(
+    filename = os.path.join(DROPBOX_CSV_PATH, "KI_SI_sample_Index.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1457,7 +1432,8 @@ def samp_import(filename = '/Users/jillian/Dropbox/Stable isotope database/input
 
 
 
-def samp_locations(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KI_SI_sample_Index.csv'):
+def samp_locations(
+    filename = os.path.join(DROPBOX_CSV_PATH, "KI_SI_sample_Index.csv")):
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1495,29 +1471,29 @@ def samp_locations(filename = '/Users/jillian/Dropbox/Stable isotope database/in
 
 
 def spares_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KI_SI_sample_Index.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "KI_SI_sample_Index.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
         for row in csvreader:
             line_number += 1
-            SpecimenID = row['SpecimenID']
-            Container = row['spare location']
-            Institution = 'UVic'
+            specimen_id = row['SpecimenID']
+            container = row['spare location']
+            institution = 'UVic'
 
         # FK lookup:
             try:
-                SpecimenID = Specimens.objects.get(SpecimenID=SpecimenID)
+                specimen_id = Specimens.objects.get(SpecimenID=specimen_id)
 
             except ObjectDoesNotExist as e:
                 logging.warn('line %s specimen %s does not exist' 
-                    % (line_number, SpecimenID))
+                    % (line_number, specimen_id))
                 continue
 
             s, created = SpecimenSpareSamples.objects.get_or_create(
-                fk_Specimen=SpecimenID,
-                Container=Container,
-                Institution=Institution
+                fk_Specimen=specimen_id,
+                Container=container,
+                Institution=institution
                 )
 
             if created:
@@ -1525,7 +1501,7 @@ def spares_import():
 
 
 def state_import():
-    filename = 'csv_data/SharkStates.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/SharkStates.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -1540,7 +1516,7 @@ def state_import():
 
 
 def piece_import():
-    filename = 'csv_data/SharkPieces.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/SharkPieces.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -1555,7 +1531,8 @@ def piece_import():
 
 
 def shark_spec_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KIR2012 - filtering, outreach, surveys.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "KIR2012 - filtering, outreach, surveys.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1576,7 +1553,13 @@ def shark_spec_import():
             else:
                 collection_notes = collection_notes + ". "
 
-            collection_notes = collection_notes + "Shark specimens do not necessarily represent individual specimens. In some cases, fins are identified as being from the same specimen but in most cases it was not possible to identify a complete set of fins as being from a single shark. Most dorsal fins and tail fins are recorded as individual specimens although they come from the same specimens as some of the pectoral fin sets."
+            collection_notes = collection_notes + """Shark specimens do not 
+            necessarily represent individual specimens. In some cases, fins are 
+            identified as being from the same specimen but in most cases it was 
+            not possible to identify a complete set of fins as being from a 
+            single shark. Most dorsal fins and tail fins are recorded as 
+            individual specimens although they come from the same specimens as 
+            some of the pectoral fin sets."""
 
             try:
                 site = Sites.objects.get(SiteName = site_name)
@@ -1630,7 +1613,7 @@ def shark_spec_import():
                 logging.warn('line %s: %s' % (line_number, e))
 
 def sharkdis_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/shark_dissections.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "shark_dissections.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         for row in csvreader:
@@ -1677,7 +1660,8 @@ def sharkdis_import():
                 sds.save()
 
 def shark_samp_prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/MW_DirectedStudies_SharkSamples.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "MW_DirectedStudies_SharkSamples.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1791,7 +1775,7 @@ def shark_samp_prep_import():
 
 
 def prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/consolidated_preprocessing.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, "consolidated_preprocessing.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1846,10 +1830,12 @@ def prep_import():
                 if created:
                     prep.save()
             except IntegrityError as e:
-                logging.warn("line: %s fk_Sample is not unique: %s" % (line_number, sample_id))
+                logging.warn("line: %s fk_Sample is not unique: %s" % 
+                    (line_number, sample_id))
 
 def ki_2011_pp_prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_PP_preprocessing_treatment.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "2011_KI_PP_preprocessing_treatment.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -1944,7 +1930,8 @@ def ki_2011_pp_prep_import():
                     (line_number, sample_id, e))
 
 def uvic_prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2005,31 +1992,11 @@ def uvic_prep_import():
                     prep.save()
             except IntegrityError as e:
                 logging.warn("line: %s fk_Sample is not unique: %s" % (line_number, sample))
-"""
-def BZ_prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv'
-    with open(filename, 'rU') as csvfile:
-        csvreader = csv.DictReader(csvfile)
-        line_number = 1
-        for row in csvreader:
-            line_number += 1
-            sample_id = row['code']
-            treatment = row['Treatment']
 
-            sample = Samples.objects.get(SampleID = sample_id)
-            treat = Treatments.objects.get(TreatmentCode = treatment)
-
-            prep, created = Preprocessings.objects.get_or_create(
-                fk_Sample = sample,
-                fk_Treatment = treat
-                )
-
-            if created:
-                prep.save()
-"""
 
 def uvic_FISH_prep_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/New_Fish Prep Data Entry Sheet.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "New_Fish Prep Data Entry Sheet.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2101,7 +2068,8 @@ def uvic_FISH_prep_import():
 
 
 def uvic_2011_packed_import():
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/UVICpacking_sheet_data_WORKING_COPY2.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "UVICpacking_sheet_data_WORKING_COPY2.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2166,14 +2134,17 @@ def uvic_2011_packed_import():
                     ps.save()
 
             except IntegrityError as e:
-               logging.warn("line: %s tray_name and position is not unique: %s %s%s" % (line_number, tray_name, trow, col))
+               logging.warn(
+                "line: %s tray_name and position is not unique: %s %s%s" % 
+                (line_number, tray_name, trow, col))
 
             except Exception as e:
                 logging.warn("error %s: in line: %s " % (e, line_number))
 
 def sfu_packed_import():
     #PackedSamples.objects.all().delete()
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/sfu_packing_sheet_data_working_copy.csv'
+    filename = os.path.join(DROPBOX_CSV_PATH, 
+        "sfu_packing_sheet_data_working_copy.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2228,14 +2199,16 @@ def sfu_packed_import():
                     ps.save()
 
             except IntegrityError as e:
-               logging.warn("line: %s tray_name and position is not unique: %s %s%s" % (line_number, tray_name, tray_row, tray_column))
+               logging.warn(
+                "line: %s tray_name and position is not unique: %s %s%s" % 
+                (line_number, tray_name, tray_row, tray_column))
 
             except Exception as e:
                 logging.warn("error %s: in line: %s " % (e, line_number))
 
 def uvic_2012_packed_import():
     #PackedSamples.objects.filter(id__gt = 1780).delete()
-    filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/New_SI Packing Sheet_May23.csv'    
+    filename = os.path.join(DROPBOX_CSV_PATH, "New_SI Packing Sheet_May23.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2254,7 +2227,8 @@ def uvic_2012_packed_import():
             notes = row['Notes']
 
 
-            if (sample_id is None or sample_id == '') and (new_shark is None or new_shark == '') or sample_id == "STANDARD":
+            if (sample_id is None or sample_id == '') and (new_shark is None or 
+                new_shark == '') or sample_id == "STANDARD":
                 continue
             else:
 
@@ -2300,14 +2274,16 @@ def uvic_2012_packed_import():
                         ps.save()
 
                 except IntegrityError as e:
-                   logging.warn("line: %s tray_name and position is not unique: %s %s%s" % 
+                   logging.warn(
+                    "line: %s tray_name and position is not unique: %s %s%s" % 
                     (line_number, tray_name, tray_row, tray_column))
 
                 except Exception as e:
                     logging.warn("error %s: in line: %s " % (e, line_number))
 
 
-def results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/consolidated_sfu_results.csv"):
+def results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
+    "SI Results/consolidated_sfu_results.csv")):
     #Results.objects.all().delete()
     print filename
     with open(filename, 'rU') as csvfile:
@@ -2363,19 +2339,27 @@ def results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/in
                     if created:
                         result.save()
                 except IntegrityError as e:
-                    logging.warn("line %s: sample %s %s" % (line_number, sample_id, e))
+                    logging.warn("line %s: sample %s %s" % 
+                        (line_number, sample_id, e))
 
                 except ValidationError as e:
-                    logging.warn("line %s: sample %s %s" % (line_number, sample_id, e))
+                    logging.warn("line %s: sample %s %s" % 
+                        (line_number, sample_id, e))
 
 
 # dirty dirty dirty
 def main():
     # build the path to the sqlite db
-    db = os.path.join(os.getcwd(), "db/sqlite3.db")
+    #db = os.path.join(os.getcwd(), "db/sqlite3.db")
 
     # delete the database file
-    call(["rm %s" % db], shell=True)
+    #call(["rm %s" % db], shell=True)
+
+    call("psql postgres", shell=True)
+
+    call("dropdb fishdb", shell=True)
+
+    call("createdb fishdb", shell=True)
 
     # recreate the database so all tables are present but empty
     call("python manage.py syncdb --noinput", shell=True)
@@ -2448,36 +2432,51 @@ def main():
     print '> All KIF12 specimen import'
     kif12_spec_import()
 
-#    print '> BZ fish specimen import'
- #   bz_fish_spec(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/Zgliczynski_SampleIndex.csv')
 
     print '> 2011 PP specimen import'
-    PP_2011_spec(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_PP_collections2.csv')
+    PP_2011_spec(
+        filename = os.path.join(DROPBOX_CSV_PATH, "2011_KI_PP_collections2.csv")
+        )
 
     print '> UVIC PP specimen import'
-    Uvic_PP_import(filename='/Users/jillian/Dropbox/Stable isotope database/input_data/UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv')
+    Uvic_PP_import(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "UVICmacroprepping_sheet_data_WORKING_COPY_May24.csv")
+    )
 
     print '---------'    
     print '>> Start of Dissection Imports'
     print '> RT10 dissections'
-    dis_import_RT10(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/RT_dissections10.csv')
+    dis_import_RT10(
+        filename = os.path.join(DROPBOX_CSV_PATH, "RT_dissections10.csv")
+        )
 
     print '> CW1 dissections'
-    dis_import_CW1(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/CW_merged_isotope_dissections2011.csv')
+    dis_import_CW1(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "CW_merged_isotope_dissections2011.csv")
+    )
 
     print '> CW2 dissections'
-    dis_import_CW2(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/CW_dis_merged_2012.csv')
+    dis_import_CW2(
+        filename = os.path.join(DROPBOX_CSV_PATH, "CW_dis_merged_2012.csv")
+        )
 
     print '> KIF11 dissections'
-    dis_import_KI11(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2011_KI_fish_dissections.csv')
+    dis_import_KI11(
+        filename = os.path.join(DROPBOX_CSV_PATH, "2011_KI_fish_dissections.csv")
+        )
 
     print '> All KIF12 dissection import'
-    dis_import_KI12(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/2012_Kiritimati_field_fish_dissections.csv')   
+    dis_import_KI12(
+        filename = os.path.join(DROPBOX_CSV_PATH, 
+            "2012_Kiritimati_field_fish_dissections.csv")
+        )   
 
     print '---------'
     print '>> Start of Sample Imports'
     print '> KI sample index import'
-    samp_import(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KI_SI_sample_Index.csv')
+    samp_import(
+        filename = os.path.join(DROPBOX_CSV_PATH, "KI_SI_sample_Index.csv")
+        )
 
     print '---------'
     print '>> Start of preprocessing imports'
@@ -2534,20 +2533,28 @@ def main():
     print '>> Start of results imports'
     
     print '> SFU old results import'
-    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/consolidated_sfu_results.csv")
+    results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "SI Results/consolidated_sfu_results.csv")
+    )
     
     print '> UVic KI12TRAY1-7 import'
-    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/RTKI003_Tray4_KIF_Tray1-7 data.csv")
+    results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "SI Results/RTKI003_Tray4_KIF_Tray1-7 data.csv")
+    )
 
     print '> UVic KI12TRAY8-14 import'
-    results_import(filename = "/Users/jillian/Dropbox/Stable isotope database/input_data/SI Results/Tray8-14data.csv")
+    results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "SI Results/Tray8-14data.csv")
+        )
 
 
     print ' > Specimen Spare Samples'
     spares_import()
 
     print '> Sample locations import'
-    samp_locations(filename = '/Users/jillian/Dropbox/Stable isotope database/input_data/KI_SI_sample_Index.csv')
+    samp_locations(filename = os.path.join(DROPBOX_CSV_PATH, 
+        "KI_SI_sample_Index.csv")
+    )
 
 
     print '---------'
