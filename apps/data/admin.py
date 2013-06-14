@@ -75,6 +75,7 @@ class SAMPadmin(admin.ModelAdmin):
                      'fk_SampleType__SampleType',
                      'fk_Specimen__fk_Species__SpeciesCode',
                      'preprocessings__fk_Treatment__TreatmentCode']
+    
     actions = (export_model_as_csv,)
 
 
