@@ -1,20 +1,8 @@
 #!/usr/bin/env python
-"""
-git add -A
-then type
-git commit -m "updates"
-then type
-git push
-"""
 
-"""
-source venv/bin/activate
-"""
-
-# setup django
 import os
 import csv
-import collections
+#import collections
 from datetime import datetime
 from decimal import Decimal
 import logging
@@ -34,7 +22,7 @@ from apps.species.models import *
 
 setup_environ(settings)
 DROPBOX_CSV_PATH = os.environ.get("DROPBOX_CSV_PATH")
-#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fishdb.settings")
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -64,6 +52,13 @@ def shitty_date_conversion(dt_str, blank=False):
     if not dt and not blank:
         raise Exception('%s is a shitty date' % dt_str)
     return dt
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
 def cm_import():
@@ -1400,8 +1395,8 @@ def samp_import(
             try:
                 specimen = Specimens.objects.get(SpecimenID=SpecimenID)
             except ObjectDoesNotExist as e:
-                logging.warn('line %s specimen %s does not exist' 
-                    % (line_number, SpecimenID))
+                #logging.warn('line %s specimen %s does not exist' 
+                 #   % (line_number, SpecimenID))
                 
                 # go on to the next sample
                 logging.error('line %s: skipping %s' % (line_number, SampleID))
@@ -1690,8 +1685,10 @@ def shark_samp_prep_import():
 
             if old_samp is None or old_samp == '':
                 old_sample_id = old_spec + '_' + sample_id
-            else:
+            elif is_number(old_samp[0]):
                 old_sample_id = old_spec + '_' + old_samp
+            else:
+                old_sample_id = old_spec + old_samp
 
         # SAMPLES Import:
             try:
@@ -2208,7 +2205,7 @@ def sfu_packed_import():
 
 def uvic_2012_packed_import():
     #PackedSamples.objects.filter(id__gt = 1780).delete()
-    filename = os.path.join(DROPBOX_CSV_PATH, "New_SI Packing Sheet_May23.csv")
+    filename = os.path.join(DROPBOX_CSV_PATH, "New_SI Packing Sheet_Jun13.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -2355,14 +2352,13 @@ def main():
     # delete the database file
     #call(["rm %s" % db], shell=True)
 
-    call("psql postgres", shell=True)
-
     call("dropdb fishdb", shell=True)
 
     call("createdb fishdb", shell=True)
 
     # recreate the database so all tables are present but empty
     call("python manage.py syncdb --noinput", shell=True)
+    
 
     print ' > Collection Methods'
     cm_import()
@@ -2536,6 +2532,8 @@ def main():
     results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
         "SI Results/consolidated_sfu_results.csv")
     )
+    #sys.exit("breather")
+    
     
     print '> UVic KI12TRAY1-7 import'
     results_import(filename = os.path.join(DROPBOX_CSV_PATH, 
