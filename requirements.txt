@@ -1,4 +1,4 @@
-Django==1.4.3
+Django==1.5.1
 django-data-exports==0.3
 django-extensions==1.0.3
 django-inspect-model==0.4
