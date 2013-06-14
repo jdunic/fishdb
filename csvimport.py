@@ -2228,6 +2228,13 @@ def uvic_2012_packed_import():
             notes = row['Notes']
 
 
+            if cap_wt.strip() == '':
+                cap_wt = None
+
+            if filled_wt.strip() == '':
+                filled_wt = None
+
+
             if (sample_id is None or sample_id == '') and (new_shark is None or 
                 new_shark == '') or sample_id == "STANDARD":
                 continue
