@@ -147,6 +147,26 @@ class Samples(models.Model):
     def __unicode__(self):
         return u'%s' % (self.SampleID)
         
+class BarcodedSamples(models.Model):
+    fk_Sample = models.ForeignKey('Samples', unique=True)
+    TrayName = models.CharField(max_length=255)
+    DateSubmitted = models.DateField()
+    DateEntered = models.DateField(auto_now_add=True)
+    TrayPosition = models.CharField(max_length=255)
+    Preprocessings = models.CharField(max_length=255, null=True, blank=True)
+    Notes = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return u'Barcoded Sample: %s' % (self.fk_Sample.SampleID)
+
+class BarcodedResults(models.Model):
+    fk_Barcoded = models.ForeignKey('BarcodedSamples', unique=True)
+    Species = models.CharField(max_length=255)
+    DateProcessed = models.DateField()
+    Notes = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return u'Barcoded Result: %s' % (self.fk_Barcoded.fk_Sample.SampleID)
 
 class Preprocessings(models.Model):
     fk_Sample = models.ForeignKey('Samples', unique=True)

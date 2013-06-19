@@ -78,6 +78,23 @@ class SAMPadmin(admin.ModelAdmin):
     
     actions = (export_model_as_csv,)
 
+class BARadmin(admin.ModelAdmin):
+    def get_sampID(self, o):
+        return '%s' % o.fk_Sample.SampleID
+    get_sampID.short_description = "SampleID"
+
+    list_display = ('get_sampID', 'TrayName', 'DateSubmitted', 'TrayPosition', )
+    list_filter = ['fk_Sample__fk_Specimen__fk_Site__SiteName', 
+                   'fk_Sample__fk_Specimen__fk_Species__fk_Guild__GuildCode']
+
+class BARRESadmin(admin.ModelAdmin):
+    def get_sampID(self, o):
+        return '%s' % o.fk_Barcoded.fk_Sample.SampleID
+    get_sampID.short_description = "SampleID"
+
+    list_display = ('get_sampID', 'Species', 'DateProcessed', )
+    list_filter = ['fk_Barcoded__fk_Sample__fk_Specimen__fk_Site__SiteName', 
+                   'fk_Barcoded__fk_Sample__fk_Specimen__fk_Species__fk_Guild__GuildCode']
 
 class PREPadmin(admin.ModelAdmin):
     def get_sampID(self, o):
@@ -147,6 +164,8 @@ class REadmin(admin.ModelAdmin):
 admin.site.register(Specimens, SPECadmin)
 admin.site.register(Dissections, DISadmin)
 admin.site.register(Samples, SAMPadmin)
+admin.site.register(BarcodedSamples, BARadmin)
+admin.site.register(BarcodedResults, BARRESadmin)
 admin.site.register(Preprocessings, PREPadmin)
 admin.site.register(PackedSamples, PSadmin)
 admin.site.register(Results, REadmin)
