@@ -33,9 +33,18 @@ class SHDISadmin(admin.ModelAdmin):
 
 
 class SHSAMPadmin(admin.ModelAdmin):
+    def get_specID(self, o):
+        return '%s' % o.fk_Sample.fk_Specimen.SpecimenID
+    get_specID.short_description = "SpecimenID"
+
     def get_samp(self, o):
         return '%s' % o.fk_Sample.SampleID
     get_samp.short_description = "SampleID"
+
+    def get_species(self, o):
+        return '%s' % o.fk_Sample.fk_Specimen.fk_Species.SpeciesCode
+    get_species.short_description = "SpeciesCode"
+    get_species.admin_order_field = "fk_Sample__fk_Specimen__fk_Species"
 
     def get_piece(self, o):
         return '%s' % o.fk_SharkPiece.SharkPiece
@@ -45,7 +54,14 @@ class SHSAMPadmin(admin.ModelAdmin):
         return '%s' % o.fk_State.State
     get_state.short_description = "Experimental Treatment"
 
-    list_display = ('get_samp', 'get_piece', 'get_state',)
+    def get_notes(self, o):
+        return '%s' % o.fk_Sample.Notes
+    get_notes.short_description = "Notes"
+
+
+    list_display = ('get_specID', 'get_samp', 'get_species', 'get_piece', 
+        'get_state', 'get_notes')
+
 
 
 
