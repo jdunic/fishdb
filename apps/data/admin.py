@@ -19,7 +19,8 @@ class SPECadmin(admin.ModelAdmin):
                    'fk_Site__SiteName',
                    'fk_Species__Genus']
 
-    search_fields = ['SpecimenID']
+    search_fields = ['SpecimenID', 
+                     'fk_Species__SpeciesCode']
 
 
 class DISadmin(admin.ModelAdmin):
@@ -152,7 +153,8 @@ class REadmin(admin.ModelAdmin):
 
     search_fields = ['fk_Packed__fk_Sample__SampleID',
                      'fk_Packed__fk_TrayName__TrayName',
-                     'Lab'
+                     'Lab', 
+                     'fk_Packed__fk_Sample__fk_Specimen__fk_Species__SpeciesCode'
                      ]
 
     list_filter = ['fk_Packed__fk_Sample__fk_Specimen__fk_Species__fk_Type__Type',
