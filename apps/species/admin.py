@@ -23,7 +23,11 @@ class LWadmin(admin.ModelAdmin):
 
 class SPadmin(admin.ModelAdmin):
     def get_guild_code(self, o):
-        return '%s' % o.fk_Guild.GuildCode
+        try:
+            return '%s' % o.fk_Guild.GuildCode
+        except AttributeError:
+            return None
+
     get_guild_code.short_description = "Guild Code"
 
     def get_type(self, o):
@@ -38,7 +42,9 @@ class SPadmin(admin.ModelAdmin):
     def method_names(self, o):
         return ', '.join(o.Methods.all().values_list('Method', flat=True))
 
-    list_display = ('SpeciesCode', 'get_guild_code', 'ScientificName', 'Order', 'Family', 'Genus', 'LocalName', 'EnglishName','get_type', 'habitat_names', 'method_names',)
+    list_display = ('SpeciesCode', 'get_guild_code', 'ScientificName', 'Order', 
+                    'Family', 'Genus', 'LocalName', 'EnglishName','get_type', 
+                    'habitat_names', 'method_names',)
 
     list_filter = ['fk_Guild__GuildCode']
 
