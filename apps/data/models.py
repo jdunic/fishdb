@@ -189,7 +189,7 @@ class Preprocessings(models.Model):
 
 
 class PackedSamples(models.Model):
-    fk_Sample = models.ForeignKey('Samples')
+    fk_Sample = models.ForeignKey('Samples', unique=True)
     fk_TrayName = models.ForeignKey(Trays)
     
     TrayRow = models.CharField(max_length=1)
@@ -241,11 +241,15 @@ class Results(models.Model):
 
 
 class SampleLocations(models.Model):
-    fk_Sample = models.ForeignKey(Samples)
+    fk_Sample = models.ForeignKey('Samples')
     fk_Location = models.ForeignKey(Locations)
     
     DateUpdated = models.DateField(auto_now_add=True)
     EnteredBy = models.CharField(max_length=255)
+    Status = models.CharField(max_length=255,null=True, blank=True) # Remove nulls and blanks after importing
+    DateStatusUpdated = models.DateField(null=True, blank=True)
+    ContainerType = models.CharField(max_length=255)
+    ContainerName = models.CharField(max_length=255) 
 
     # FMP fun fact 3: you need to create an extra calculation field to make
         # composite keys before you can constrain your data to have unique
@@ -255,7 +259,12 @@ class SampleLocations(models.Model):
         unique_together = ("fk_Sample", "fk_Location", "DateUpdated")
 
     def __unicode__(self):
-        return u'%s' % (self.fk_Location)
+        return u'%s status: %s at %s %s %s' % (self.fk_Sample.SampleID,
+                                   self.Status,
+                                   self.fk_Location,
+                                   self.ContainerType,
+                                   self.ContainerName
+                                   )
 
 
 class SpecimenSpareSamples(models.Model):
