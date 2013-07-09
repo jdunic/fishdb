@@ -160,8 +160,28 @@ class REadmin(admin.ModelAdmin):
     list_filter = ['fk_Packed__fk_Sample__fk_Specimen__fk_Species__fk_Type__Type',
                    'ReliableResult']
 
+class SLOCadmin(admin.ModelAdmin):
+    def get_sampID(self, o):
+        return '%s' % o.fk_Sample.SampleID
+    get_sampID.short_description = "SampleID"
+    get_sampID.admin_order_field = "fk_Location__fk_Sample__SampleID"
+
+    def get_institution(self, o):
+        return '%s' % o.fk_Location.Institution
+    get_institution.short_description = "Institution"
 
 
+    list_display = ('get_sampID', 'Status', 'get_institution', 'ContainerType',
+                    'ContainerName')
+
+    search_fields = ['fk_Location__fk_Sample__SampleID',
+                     'fk_Location',
+                     'Status'
+                     ]
+
+    list_filter = ['Status',
+                   'fk_Location'
+                   ]
 
 
 admin.site.register(Specimens, SPECadmin)
@@ -172,7 +192,7 @@ admin.site.register(BarcodedResults, BARRESadmin)
 admin.site.register(Preprocessings, PREPadmin)
 admin.site.register(PackedSamples, PSadmin)
 admin.site.register(Results, REadmin)
-admin.site.register(SampleLocations)
+admin.site.register(SampleLocations, SLOCadmin)
 admin.site.register(SpecimenSpareSamples)
 
 
