@@ -36,7 +36,8 @@ class DISadmin(admin.ModelAdmin):
         'FL', 'gh', 'gw', 'PreySize', 'StomachSample', 'StomachContents', 
         'Notes','DissectedBy',)
 
-    search_fields = ['fk_Specimen__SpecimenID']
+    search_fields = ['fk_Specimen__SpecimenID', 
+        'fk_Specimen__fk_Species__SpeciesCode']
 
 
 class SAMPadmin(admin.ModelAdmin):
