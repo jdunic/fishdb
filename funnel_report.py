@@ -23,7 +23,9 @@ filename = "funnel_list_%s.csv" % date
 
 writer = csv.writer(open(filename, 'wb'), dialect='excel')
 
-writer.writerow(['List of specimens that do not have results because they have not progressed through the entire processing chain.'])
+writer.writerow(["""List of specimens that do not have results because they 
+                    have not progressed through the entire processing chain.
+                    """])
 writer.writerow([''])
 
 
@@ -31,7 +33,8 @@ writer.writerow([''])
 # and exclude the CHRMAR CW samples that were lost from the Stanford freezer
 fish = Specimens.objects.select_related().filter(
     fk_Species__fk_Type__Type='fish').exclude(
-    CollectionNotes__contains='all samples for Chromis margaritifer were lost from the Stanford freezer')
+    CollectionNotes__contains="""all samples for Chromis margaritifer were
+                                 lost from the Stanford freezer""")
 
 ### A ### - Dissections are probably needed:
 # 2 - get all of the fish that have no samples
@@ -39,7 +42,8 @@ samples = Samples.objects.select_related().all()
 
 A = fish.exclude(samples__in=samples).distinct('SpecimenID')
 
-writer.writerow(['Specimens that have NO samples and likely have not been dissected'])
+writer.writerow(["""Specimens that have NO samples and likely have not 
+                    been dissected"""])
 writer.writerow([''])
 
 row = [
@@ -274,7 +278,8 @@ D = need_submit
 
 
 writer.writerow([''])
-writer.writerow(['List of specimens that have packed "NA" but need to be submitted'])
+writer.writerow(["""List of specimens that have packed "NA" but need to 
+                    be submitted"""])
 writer.writerow([''])
 
 row = [
@@ -364,7 +369,8 @@ for d in D:
     except MultipleObjectsReturned as e:
         try:
             for s in d.samples_set.all():
-                p_list = s.packedsamples_set.all().values_list('Notes', flat=True)
+                p_list = s.packedsamples_set.all() \
+                .values_list('Notes', flat=True)
                 packed_notes = ', '.join(p_list)
         except TypeError as e:
             packed_notes = "manually check notes"
