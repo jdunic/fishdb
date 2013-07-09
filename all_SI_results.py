@@ -60,9 +60,9 @@ row = [
 
 writer.writerow(row)
 
-for fish in na:
-    samp = fish.fk_Packed.fk_Sample
-    spec = fish.fk_Packed.fk_Sample.fk_Specimen
+for r in results:
+    samp = r.fk_Packed.fk_Sample
+    spec = r.fk_Packed.fk_Sample.fk_Specimen
 
     sample = samp.SampleID
     specimen = spec.SpecimenID
@@ -80,21 +80,33 @@ for fish in na:
     site = spec.fk_Site.SiteName
     fish_prod = spec.fk_Site.ProdFish
 
-    size = spec.dissections_set.get().SizeClass()
-    wt = spec.dissections_set.get().wt
-    tl = spec.dissections_set.get().TL
-    sl = spec.dissections_set.get().SL
+    sp_type = spec.fk_Species.fk_Type.Type
+
+    if sp_type == 'fish':
+        try:
+            size = spec.dissections_set.get().SizeClass()
+            wt = spec.dissections_set.get().wt
+            tl = spec.dissections_set.get().TL
+            sl = spec.dissections_set.get().SL
+            dis_notes = spec.dissections_set.get().Notes
+        except ObjectDoesNotExist as e:
+            logging.warn("%s %s" % (specimen, e))
+    else:
+        size = None
+        wt = None
+        tl = None
+        sl = None
+        dis_notes = None
 
     treat = samp.preprocessings_set.get().fk_Treatment.TreatmentCode
 
-    dC13 = fish.d13C
-    dN15 = fish.d15N
+    dC13 = r.d13C
+    dN15 = r.d15N
 
     coll_notes = spec.CollectionNotes
-    dis_notes = spec.dissections_set.get().Notes
     samp_notes = samp.Notes
     prep_notes = samp.preprocessings_set.get().Notes
-    packed_notes = fish.fk_Packed.Notes
+    packed_notes = r.fk_Packed.Notes
 
     row = [
         sample,
