@@ -41,9 +41,10 @@ row = [
     "Site",
     "Region",
 
-    "SizeClass"
+    "SizeClass",
     "Weight_(g)",
     "TL_(mm)",
+    "FL_(mm)",
     "SL_(mm)",
 
     "Treatment",
@@ -87,6 +88,7 @@ for r in results:
             size = spec.dissections_set.get().SizeClass()
             wt = spec.dissections_set.get().wt
             tl = spec.dissections_set.get().TL
+            fl = spec.dissections_set.get().FL
             sl = spec.dissections_set.get().SL
             dis_notes = spec.dissections_set.get().Notes
         except ObjectDoesNotExist as e:
@@ -95,6 +97,7 @@ for r in results:
         size = None
         wt = None
         tl = None
+        fl = None
         sl = None
         dis_notes = None
 
@@ -123,6 +126,7 @@ for r in results:
         size,
         wt,
         tl,
+        fl,
         sl,
 
         treat,
