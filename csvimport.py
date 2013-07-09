@@ -9,18 +9,18 @@ import logging
 import sys
 from subprocess import call
 
+from django.conf import settings
 from django.core.management import setup_environ
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 
-from fishdb import settings
+#from fishdb import settings
 from apps.data.models import *
 from apps.helpers.models import *
 from apps.sharks.models import *
 from apps.species.models import *
 
-setup_environ(settings)
 DROPBOX_CSV_PATH = os.environ.get("DROPBOX_CSV_PATH")
 
 
@@ -1927,8 +1927,8 @@ def ki_2011_pp_prep_import():
                     prep.save()
 
             except IntegrityError, e:
-                logging.warn('line %s: sampleID %s %s' % 
-                    (line_number, sample_id, e))
+                logging.warn('line %s: sampleID %s is not unique' % 
+                    (line_number, sample_id))
 
 def uvic_prep_import():
     filename = os.path.join(DROPBOX_CSV_PATH, 

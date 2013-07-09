@@ -1,9 +1,8 @@
 from os.path import dirname, realpath, join
+import os
 
 # Django settings for fishdb project.
 DJANGO_ROOT = dirname(realpath(__file__))
-
-import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
