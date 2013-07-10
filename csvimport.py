@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+1#!/usr/bin/env python
 
 import os
 import csv
@@ -1251,7 +1251,7 @@ def dis_import_KI11(
                     DateDissected=date_dissected,
                     StomachContents=stomach_contents,
                     Notes=notes,
-                    DissectedBy=date_dissected,
+                    DissectedBy=dissected_by,
                     StomachSample=stomach_sample
                 )
 
