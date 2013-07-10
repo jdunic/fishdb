@@ -2284,7 +2284,7 @@ def uvic_2012_packed_import():
                 except IntegrityError as e:
                    logging.warn(
                     "line: %s tray_name and position is not unique: %s %s%s" % 
-                    (line_number, tray_name, tray_row, tray_column))
+                    (line_number, tray_name, tray_row, tray_col))
 
                 except Exception as e:
                     logging.warn("error %s: in line: %s " % (e, line_number))
