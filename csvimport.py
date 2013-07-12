@@ -1,4 +1,4 @@
-1#!/usr/bin/env python
+#!/usr/bin/env python
 
 import os
 import csv
@@ -228,8 +228,8 @@ def sp_type():
             spt = SpeciesTypes.objects.create(
                 Type=Type) 
 
-def sp_import(
-    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Taxonomies.csv")):
+def sp_import():
+    filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Taxonomies.csv")
     with open(filename, 'rU') as csvfile:
         csvreader = csv.DictReader(csvfile)
         line_number = 1
@@ -237,15 +237,13 @@ def sp_import(
             EnglishName = row['EnglishName']
             family = row['Family']
             fmp_guild = row['fk_GuildID']
-            fmp_lw = row['fk_LengthWeightID']
+            #fmp_lw = row['fk_LengthWeightID']
             LocalName = row['LocalName']
             notes = row['Notes']
             order = row['Order']
             #fmp_speciesID = row['pk_SpeciesID']
             SciName = row['ScientificName']
             code = row['SpeciesCode']
-            guild = None
-            lw = None
             Type = row['Type']
 
 
@@ -256,39 +254,15 @@ def sp_import(
             except:
                 pass
 
-            # make shit an int... IF not ''
-            #if fmp_speciesID == '':
-             #   fmp_pk = None
-
-            #if fmp_speciesID is None:
-             #   fmp_pk = None
-            #else:
-             #   fmp_pk = int(fmp_speciesID)
-
-            if fmp_guild == '':
-                guild1 = None
-            else:
-                guild1 = int(fmp_guild)
-
-            if fmp_lw == '':
-                lw1 = None
-            else:
-                lw1 = int(fmp_lw)
+            try:
+                lw = LengthWeights.objects.get(SpeciesCode=code)
             
-            # FK lookups:
-            if guild1 is not None:
-                guild, created = FunctionalGroups.objects.get_or_create(fmp_guildID=guild1)
-                if created:
-                    logging.info('created guild: %s' % guild)
-                    guild.save()
-            if lw1 is not None:
-                lw, created = LengthWeights.objects.get_or_create(fmp_LWid=lw1)
-                #if created:
-                 #   logging.info('created lengthweights: %s' % lw)
-                lw.save()
+            except ObjectDoesNotExist as e:
+                logging.warn("no length weight for %s" % e)
+                lw = None
+                pass
 
             Type = SpeciesTypes.objects.get(Type=Type)
-
 
             try:
                 spp = Species.objects.create(
@@ -300,7 +274,7 @@ def sp_import(
                     EnglishName=EnglishName,
                     SpeciesCode=code,
                     Notes=notes,
-                    fk_Guild=guild,
+                    #fk_Guild=guild,
                     fk_LengthWeight=lw,
                     fk_Type=Type
                 )
@@ -308,6 +282,39 @@ def sp_import(
             except IntegrityError as e:
                 logging.warn("%s:%s Duplicate Species code: %s" % (filename, line_number, code))
             line_number += 1
+
+    filename = os.path.join(DROPBOX_CSV_PATH, "species_functional_roles.csv")
+    with open(filename, 'rU') as csvfile:
+        csvreader = csv.DictReader(csvfile)
+        line_number = 1
+        for row in csvreader:
+            species_code = row['sp.code']
+            guild = row['troph_guild']
+            notes = row['Notes']            
+            species = Species.objects.get(SpeciesCode=species_code)
+            
+            if guild is None or guild == '':
+                continue
+            
+            # Need this to update notes and preserve any potentially existing
+            # species notes
+            if notes is None or notes == '':
+                pass
+                #print "no guild notes"
+            else:
+                if species.Notes is not None or species.Notes == '':
+                    species.Notes = species.Notes + ". FG note: %s" % notes
+                    #print species.Notes
+                else:
+                    species.Notes = "FG notes: %s" % notes
+                    #print species.Notes
+            
+            # Updating and saving changes to species fgs and notes
+            fg = FunctionalGroups.objects.get(GuildCode=guild)
+            species.fk_Guild=fg
+            species.save()
+
+
 
 def sites_import():
     filename = os.path.join(DROPBOX_CSV_PATH, "csv_data/Sites.csv")
@@ -2283,8 +2290,8 @@ def uvic_2012_packed_import():
 
                 except IntegrityError as e:
                    logging.warn(
-                    "line: %s tray_name and position is not unique: %s %s%s" % 
-                    (line_number, tray_name, tray_row, tray_col))
+                    "line: %s %s %s%s %s" % 
+                    (line_number, tray_name, tray_row, tray_col, e))
 
                 except Exception as e:
                     logging.warn("error %s: in line: %s " % (e, line_number))
