@@ -33,7 +33,8 @@ writer.writerow(row4)
 
 gapes = Specimens.objects.select_related() \
 	.exclude(dissections__gh__isnull=True) \
-	.exclude(dissections__gw__isnull=True)
+	.exclude(dissections__gw__isnull=True) \
+	.exclude(dissections__SL__isnull=True) 
 
 species = Species.objects.select_related().all() \
 	.annotate(num_spec=Count('specimens__SpecimenID')) \
@@ -99,8 +100,8 @@ for sp in species:
 			site,
 			region,
 			tl,
-			fl,
 			sl,
+			fl,
 			wt,
 			gh,
 			gw,

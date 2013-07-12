@@ -20,6 +20,8 @@ class LWadmin(admin.ModelAdmin):
         'ModelSpecies', 'fbMaxLen', 'fbMaxLenType', 'fbMaxRef', 'Locale', 'Sources',
         'Notes', 'DateUpdated', 'id',)
 
+    search_fields = ['SpeciesCode']
+
 
 class SPadmin(admin.ModelAdmin):
     def get_guild_code(self, o):
